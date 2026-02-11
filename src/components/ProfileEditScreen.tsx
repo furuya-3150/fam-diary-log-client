@@ -159,68 +159,9 @@ export function ProfileEditScreen({ onBack }: ProfileEditScreenProps) {
                 required
               />
               <p className="text-sm text-gray-600 mt-1">
-                ログインに使用されます
+                アプリからの通知はこのメールアドレスに送信されます
               </p>
             </div>
-
-            <div>
-              <label htmlFor="phone" className="flex items-center gap-2 text-gray-900 mb-2">
-                <Phone className="w-4 h-4" />
-                <span>電話番号</span>
-              </label>
-              <input
-                type="tel"
-                id="phone"
-                value={profile.phone}
-                onChange={(e) => setProfile({ ...profile, phone: e.target.value })}
-                placeholder="090-1234-5678"
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="birthday" className="flex items-center gap-2 text-gray-900 mb-2">
-                <Calendar className="w-4 h-4" />
-                <span>生年月日</span>
-              </label>
-              <input
-                type="date"
-                id="birthday"
-                value={profile.birthday}
-                onChange={(e) => setProfile({ ...profile, birthday: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              />
-            </div>
-
-            <div>
-              <label htmlFor="location" className="flex items-center gap-2 text-gray-900 mb-2">
-                <MapPin className="w-4 h-4" />
-                <span>お住まいの地域</span>
-              </label>
-              <input
-                type="text"
-                id="location"
-                value={profile.location}
-                onChange={(e) => setProfile({ ...profile, location: e.target.value })}
-                placeholder="東京都"
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              />
-            </div>
-          </div>
-
-          {/* 自己紹介 */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h3 className="text-gray-900 mb-4">自己紹介</h3>
-            <textarea
-              value={profile.bio}
-              onChange={(e) => setProfile({ ...profile, bio: e.target.value })}
-              placeholder="自己紹介を入力してください"
-              rows={5}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none"
-            />
-            <p className="text-sm text-gray-600 mt-2">
-              {profile.bio.length} / 500文字
-            </p>
           </div>
 
           {/* アカウント情報 */}
@@ -257,7 +198,6 @@ export function ProfileEditScreen({ onBack }: ProfileEditScreenProps) {
           <h4 className="text-gray-900 mb-3">🔒 プライバシー</h4>
           <p className="text-sm text-gray-600">
             あなたのプロフィール情報は家族グループ内のメンバーにのみ表示されます。
-            メールアドレスは通知の送信にのみ使用され、他のメンバーには公開されません。
           </p>
         </div>
       </div>
