@@ -89,11 +89,12 @@ export function SettingsScreen({ onBack, onLogout, onNavigate }: SettingsScreenP
                   <span className="text-sm px-3 py-1 bg-gray-100 text-gray-700 rounded-full">
                     {member.role}
                   </span>
-                  {member.role !== '管理者' && (
+                  {/* TODO: メンバー削除機能 */}
+                  {/* {member.role !== '管理者' && (
                     <button className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
                       <Trash2 className="w-4 h-4" />
                     </button>
-                  )}
+                  )} */}
                 </div>
               </div>
             ))}
@@ -142,79 +143,6 @@ export function SettingsScreen({ onBack, onLogout, onNavigate }: SettingsScreenP
                 className="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500"
               />
             </label>
-
-            <label className="flex items-center justify-between p-4 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
-              <div>
-                <p className="text-gray-900">週次レポート</p>
-                <p className="text-sm text-gray-600">毎週の進捗レポートを受け取る</p>
-              </div>
-              <input
-                type="checkbox"
-                checked={notifications.weeklyReport}
-                onChange={(e) =>
-                  setNotifications({ ...notifications, weeklyReport: e.target.checked })
-                }
-                className="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500"
-              />
-            </label>
-
-            <label className="flex items-center justify-between p-4 rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50">
-              <div>
-                <p className="text-gray-900">達成バッジ通知</p>
-                <p className="text-sm text-gray-600">バッジを獲得したときに通知</p>
-              </div>
-              <input
-                type="checkbox"
-                checked={notifications.achievements}
-                onChange={(e) =>
-                  setNotifications({ ...notifications, achievements: e.target.checked })
-                }
-                className="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500"
-              />
-            </label>
-          </div>
-        </div>
-
-        {/* Security */}
-        <div className="bg-white rounded-xl p-6 border border-gray-200">
-          <div className="flex items-center gap-3 mb-6">
-            <Shield className="w-5 h-5 text-gray-700" />
-            <h3 className="text-gray-900">セキュリティ</h3>
-          </div>
-
-          <div className="space-y-3">
-            <button
-              onClick={() => onNavigate?.('password-change')}
-              className="w-full flex items-center justify-between px-4 py-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-            >
-              <div className="text-left">
-                <p className="text-gray-900">パスワードの変更</p>
-                <p className="text-sm text-gray-600">アカウントのパスワードを更新</p>
-              </div>
-              <ChevronRight className="w-5 h-5 text-gray-400" />
-            </button>
-
-            <button
-              onClick={() => onNavigate?.('two-factor-auth')}
-              className="w-full flex items-center justify-between px-4 py-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-            >
-              <div className="text-left">
-                <p className="text-gray-900">2段階認証</p>
-                <p className="text-sm text-gray-600">セキュリティを強化する</p>
-              </div>
-              <ChevronRight className="w-5 h-5 text-gray-400" />
-            </button>
-
-            <button
-              onClick={() => onNavigate?.('login-history')}
-              className="w-full flex items-center justify-between px-4 py-3 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
-            >
-              <div className="text-left">
-                <p className="text-gray-900">ログイン履歴</p>
-                <p className="text-sm text-gray-600">最近のログイン履歴を確認</p>
-              </div>
-              <ChevronRight className="w-5 h-5 text-gray-400" />
-            </button>
           </div>
         </div>
 

@@ -88,8 +88,7 @@ export function CreateFamilyScreen({ onBack, onCreateFamily }: CreateFamilyScree
               <ul className="space-y-1 text-sm text-indigo-800">
                 <li>• 家族メンバーを招待できます</li>
                 <li>• 日記を投稿して家族と共有できます</li>
-                <li>• 認知機能トレーニングを始められます</li>
-                <li>• 進捗を分析・可視化できます</li>
+                <li>• 日記を分析・可視化できます</li>
               </ul>
             </div>
 
@@ -101,23 +100,6 @@ export function CreateFamilyScreen({ onBack, onCreateFamily }: CreateFamilyScree
               {isSubmitting ? '作成中...' : '家族グループを作成'}
             </button>
           </form>
-
-          {/* 注意事項 */}
-          <div className="mt-6 pt-6 border-t border-gray-200">
-            <p className="text-sm text-gray-600 text-center">
-              グループ名は後から変更できます
-            </p>
-          </div>
-        </div>
-
-        {/* 追加情報 */}
-        <div className="mt-6 bg-amber-50 rounded-xl border border-amber-200 p-6">
-          <h4 className="text-amber-900 mb-3">💡 ヒント</h4>
-          <ul className="space-y-2 text-sm text-amber-800">
-            <li>• 家族全員が分かりやすい名前を付けましょう</li>
-            <li>• グループ作成後、すぐに家族を招待できます</li>
-            <li>• 複数の家族グループを作成することも可能です</li>
-          </ul>
         </div>
       </div>
     </div>

@@ -1,47 +1,93 @@
-'use client';
+"use client";
 
-import { ArrowLeft, TrendingUp, Award, Clock, BookOpen, Target } from 'lucide-react';
-import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  ArrowLeft,
+  TrendingUp,
+  Award,
+  Clock,
+  BookOpen,
+  Target,
+} from "lucide-react";
+import {
+  LineChart,
+  Line,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import {
+  Tooltip as UITooltip,
+  TooltipTrigger,
+  TooltipContent,
+} from "./ui/tooltip";
 
 interface AnalysisDashboardProps {
   onBack: () => void;
 }
 
 const vocabularyData = [
-  { date: '12/1', score: 75 },
-  { date: '12/2', score: 78 },
-  { date: '12/3', score: 82 },
-  { date: '12/4', score: 80 },
-  { date: '12/5', score: 85 },
-  { date: '12/6', score: 83 },
-  { date: '12/7', score: 88 },
+  { date: "12/1", score: 75 },
+  { date: "12/2", score: 78 },
+  { date: "12/3", score: 82 },
+  { date: "12/4", score: 80 },
+  { date: "12/5", score: 85 },
+  { date: "12/6", score: 83 },
+  { date: "12/7", score: 88 },
 ];
 
 const writingSpeedData = [
-  { date: '12/1', words: 120 },
-  { date: '12/2', words: 135 },
-  { date: '12/3', words: 142 },
-  { date: '12/4', words: 138 },
-  { date: '12/5', words: 155 },
-  { date: '12/6', words: 148 },
-  { date: '12/7', words: 160 },
+  { date: "12/1", words: 120 },
+  { date: "12/2", words: 135 },
+  { date: "12/3", words: 142 },
+  { date: "12/4", words: 138 },
+  { date: "12/5", words: 155 },
+  { date: "12/6", words: 148 },
+  { date: "12/7", words: 160 },
 ];
 
 const writingTimeData = [
-  { date: '12/1', minutes: 8.5 },
-  { date: '12/2', minutes: 7.8 },
-  { date: '12/3', minutes: 7.2 },
-  { date: '12/4', minutes: 7.5 },
-  { date: '12/5', minutes: 6.8 },
-  { date: '12/6', minutes: 7.0 },
-  { date: '12/7', minutes: 6.5 },
+  { date: "12/1", minutes: 8.5 },
+  { date: "12/2", minutes: 7.8 },
+  { date: "12/3", minutes: 7.2 },
+  { date: "12/4", minutes: 7.5 },
+  { date: "12/5", minutes: 6.8 },
+  { date: "12/6", minutes: 7.0 },
+  { date: "12/7", minutes: 6.5 },
 ];
 
 const badges = [
-  { id: '1', name: '7日連続', icon: '🔥', description: '7日間連続で投稿', unlocked: true },
-  { id: '2', name: '語彙マスター', icon: '📚', description: '高スコアを5回達成', unlocked: true },
-  { id: '3', name: '早書き達人', icon: '⚡', description: '5分以内に投稿を3回達成', unlocked: false },
-  { id: '4', name: '月間チャンピオン', icon: '🏆', description: '月間30回投稿', unlocked: false },
+  {
+    id: "1",
+    name: "7日連続",
+    icon: "🔥",
+    description: "7日間連続で投稿",
+    unlocked: true,
+  },
+  {
+    id: "2",
+    name: "語彙マスター",
+    icon: "📚",
+    description: "高スコアを5回達成",
+    unlocked: true,
+  },
+  {
+    id: "3",
+    name: "早書き達人",
+    icon: "⚡",
+    description: "5分以内に投稿を3回達成",
+    unlocked: false,
+  },
+  {
+    id: "4",
+    name: "月間チャンピオン",
+    icon: "🏆",
+    description: "月間30回投稿",
+    unlocked: false,
+  },
 ];
 
 export function AnalysisDashboard({ onBack }: AnalysisDashboardProps) {
@@ -77,10 +123,10 @@ export function AnalysisDashboard({ onBack }: AnalysisDashboardProps) {
                 <p className="text-gray-900">82点</p>
               </div>
             </div>
-            <div className="text-xs text-green-600 flex items-center gap-1">
+            {/* <div className="text-xs text-green-600 flex items-center gap-1">
               <span>↑ 5%</span>
               <span className="text-gray-500">先週比</span>
-            </div>
+            </div> */}
           </div>
 
           <div className="bg-white rounded-xl p-4 border border-gray-200">
@@ -93,10 +139,10 @@ export function AnalysisDashboard({ onBack }: AnalysisDashboardProps) {
                 <p className="text-gray-900">145文字</p>
               </div>
             </div>
-            <div className="text-xs text-green-600 flex items-center gap-1">
+            {/* <div className="text-xs text-green-600 flex items-center gap-1">
               <span>↑ 8%</span>
               <span className="text-gray-500">先週比</span>
-            </div>
+            </div> */}
           </div>
 
           <div className="bg-white rounded-xl p-4 border border-gray-200">
@@ -109,10 +155,10 @@ export function AnalysisDashboard({ onBack }: AnalysisDashboardProps) {
                 <p className="text-gray-900">7.3分</p>
               </div>
             </div>
-            <div className="text-xs text-green-600 flex items-center gap-1">
+            {/* <div className="text-xs text-green-600 flex items-center gap-1">
               <span>↓ 12%</span>
               <span className="text-gray-500">短縮</span>
-            </div>
+            </div> */}
           </div>
 
           <div className="bg-white rounded-xl p-4 border border-gray-200">
@@ -125,10 +171,10 @@ export function AnalysisDashboard({ onBack }: AnalysisDashboardProps) {
                 <p className="text-gray-900">7日</p>
               </div>
             </div>
-            <div className="text-xs text-green-600 flex items-center gap-1">
+            {/* <div className="text-xs text-green-600 flex items-center gap-1">
               <span>🔥</span>
               <span className="text-gray-500">継続中</span>
-            </div>
+            </div> */}
           </div>
         </div>
 
@@ -142,19 +188,19 @@ export function AnalysisDashboard({ onBack }: AnalysisDashboardProps) {
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="date" stroke="#9ca3af" />
                 <YAxis stroke="#9ca3af" domain={[0, 100]} />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'white', 
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px' 
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "white",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "8px",
                   }}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="score" 
-                  stroke="#4f46e5" 
+                <Line
+                  type="monotone"
+                  dataKey="score"
+                  stroke="#4f46e5"
                   strokeWidth={3}
-                  dot={{ fill: '#4f46e5', r: 4 }}
+                  dot={{ fill: "#4f46e5", r: 4 }}
                   activeDot={{ r: 6 }}
                 />
               </LineChart>
@@ -172,18 +218,14 @@ export function AnalysisDashboard({ onBack }: AnalysisDashboardProps) {
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="date" stroke="#9ca3af" />
                 <YAxis stroke="#9ca3af" />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'white', 
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px' 
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "white",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "8px",
                   }}
                 />
-                <Bar 
-                  dataKey="words" 
-                  fill="#10b981" 
-                  radius={[8, 8, 0, 0]}
-                />
+                <Bar dataKey="words" fill="#10b981" radius={[8, 8, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
             <p className="text-sm text-gray-600 mt-4">
@@ -194,86 +236,73 @@ export function AnalysisDashboard({ onBack }: AnalysisDashboardProps) {
           {/* Writing Time Chart */}
           <div className="bg-white rounded-xl p-6 border border-gray-200">
             <h3 className="text-gray-900 mb-4">執筆時間の推移</h3>
-            <ResponsiveContainer width="100%" height={250}>
+            <ResponsiveContainer width="100%" height={300}>
               <LineChart data={writingTimeData}>
                 <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                 <XAxis dataKey="date" stroke="#9ca3af" />
                 <YAxis stroke="#9ca3af" />
-                <Tooltip 
-                  contentStyle={{ 
-                    backgroundColor: 'white', 
-                    border: '1px solid #e5e7eb',
-                    borderRadius: '8px' 
+                <Tooltip
+                  contentStyle={{
+                    backgroundColor: "white",
+                    border: "1px solid #e5e7eb",
+                    borderRadius: "8px",
                   }}
                 />
-                <Line 
-                  type="monotone" 
-                  dataKey="minutes" 
-                  stroke="#8b5cf6" 
+                <Line
+                  type="monotone"
+                  dataKey="minutes"
+                  stroke="#8b5cf6"
                   strokeWidth={3}
-                  dot={{ fill: '#8b5cf6', r: 4 }}
+                  dot={{ fill: "#8b5cf6", r: 4 }}
                   activeDot={{ r: 6 }}
                 />
               </LineChart>
             </ResponsiveContainer>
             <p className="text-sm text-gray-600 mt-4">
-              集中して短時間で書けるようになっています
+              平均: 7.3分 • 最高: 8.5分 • 最低: 6.5分
             </p>
           </div>
 
           {/* Badges */}
-          <div className="bg-white rounded-xl p-6 border border-gray-200">
-            <h3 className="text-gray-900 mb-4 flex items-center gap-2">
-              <Award className="w-5 h-5 text-yellow-500" />
-              達成バッジ
-            </h3>
-            <div className="space-y-3">
-              {badges.map((badge) => (
-                <div
-                  key={badge.id}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-all ${
-                    badge.unlocked
-                      ? 'bg-yellow-50 border-yellow-200'
-                      : 'bg-gray-50 border-gray-200 opacity-60'
-                  }`}
-                >
-                  <div className="text-3xl">{badge.icon}</div>
-                  <div className="flex-1">
-                    <p className="text-gray-900">{badge.name}</p>
-                    <p className="text-sm text-gray-600">{badge.description}</p>
-                  </div>
-                  {badge.unlocked && (
-                    <Award className="w-5 h-5 text-yellow-500" />
-                  )}
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
+          <UITooltip>
+            <div className="bg-gray-400 rounded-xl p-6 border border-gray-200">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-gray-900 flex items-center gap-2">
+                  <Award className="w-5 h-5 text-yellow-500" />
+                  達成バッジ
+                </h3>
+                <TooltipTrigger asChild>
+                  <div className="text-sm text-gray-700"></div>
+                </TooltipTrigger>
+              </div>
 
-        {/* Insights */}
-        <div className="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl p-6 border border-indigo-200">
-          <h3 className="text-indigo-900 mb-4">📊 今週の分析結果</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-white rounded-lg p-4">
-              <p className="text-green-600 mb-1">👍 良い傾向</p>
-              <p className="text-sm text-gray-700">
-                語彙レベルが安定して向上しています。日常的な言葉を使いながらも、表現力が豊かになっています。
-              </p>
+              <TooltipTrigger asChild>
+                <div className="space-y-3 cursor-help" aria-hidden>
+                  {badges.map((badge) => (
+                    <div
+                      key={badge.id}
+                      className="flex items-center gap-3 p-3 rounded-lg border transition-all bg-gray-400 border-gray-200 opacity-90"
+                    >
+                      <div className="text-3xl">{badge.icon}</div>
+                      <div className="flex-1">
+                        <p className="text-gray-900">{badge.name}</p>
+                        <p className="text-sm text-gray-600">
+                          {badge.description}
+                        </p>
+                      </div>
+                      {/* {badge.unlocked && (
+                        <Award className="w-5 h-5 text-yellow-500" />
+                      )} */}
+                    </div>
+                  ))}
+                </div>
+              </TooltipTrigger>
+
+              <TooltipContent sideOffset={8}>
+                <span>近日公開</span>
+              </TooltipContent>
             </div>
-            <div className="bg-white rounded-lg p-4">
-              <p className="text-blue-600 mb-1">💪 継続中</p>
-              <p className="text-sm text-gray-700">
-                7日間連続で投稿を続けています。この調子で習慣化していきましょう。
-              </p>
-            </div>
-            <div className="bg-white rounded-lg p-4">
-              <p className="text-purple-600 mb-1">🎯 次の目標</p>
-              <p className="text-sm text-gray-700">
-                月間30回投稿を目指しましょう。あと18回です。
-              </p>
-            </div>
-          </div>
+          </UITooltip>
         </div>
       </div>
     </div>

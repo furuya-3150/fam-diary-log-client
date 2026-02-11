@@ -167,6 +167,7 @@ export function NotificationScreen({ onBack }: NotificationScreenProps) {
           )}
         </div>
 
+
         {/* 処理済みの申請 */}
         {processedRequests.length > 0 && (
           <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
@@ -209,13 +210,12 @@ export function NotificationScreen({ onBack }: NotificationScreenProps) {
             </div>
           </div>
         )}
-
         {/* 説明 */}
         <div className="bg-blue-50 rounded-xl border border-blue-200 p-6">
           <h4 className="text-blue-900 mb-3">💡 ヒント</h4>
           <ul className="space-y-2 text-sm text-blue-800">
-            <li>• 承認すると、申請者にログイン情報がメールで送信されます</li>
-            <li>• 却下した申請者には、申請が承認されなかったことが通知されます</li>
+            <li>• 承認すると、申請者にアプリ内より通知が送信されます</li>
+            <li>• 通知が確認できない場合は、最ログインを促してください</li>
             <li>• 処理済みの申請は30日後に自動的に削除されます</li>
           </ul>
         </div>

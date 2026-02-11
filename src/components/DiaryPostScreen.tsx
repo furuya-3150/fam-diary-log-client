@@ -9,7 +9,6 @@ interface DiaryPostScreenProps {
   onSubmit: (post: Partial<DiaryPost>) => void;
 }
 
-const DIFFICULT_WORDS = ['複雑', '顕著', '概念', '哲学', '抽象', '論理', '認識'];
 const TIME_LIMIT = 300; // 5 minutes in seconds
 
 export function DiaryPostScreen({ onBack, onSubmit }: DiaryPostScreenProps) {
@@ -17,8 +16,7 @@ export function DiaryPostScreen({ onBack, onSubmit }: DiaryPostScreenProps) {
   const [content, setContent] = useState('');
   const [timeRemaining, setTimeRemaining] = useState(TIME_LIMIT);
   const [isTimerActive, setIsTimerActive] = useState(false);
-  const [vocabularyCheck, setVocabularyCheck] = useState<'good' | 'warning' | null>(null);
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
+  // const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [startTime, setStartTime] = useState<Date | null>(null);
 
   useEffect(() => {
@@ -38,24 +36,17 @@ export function DiaryPostScreen({ onBack, onSubmit }: DiaryPostScreenProps) {
   }, [content, isTimerActive]);
 
   useEffect(() => {
-    if (content.length > 20) {
-      const hasDifficultWords = DIFFICULT_WORDS.some(word => content.includes(word));
-      setVocabularyCheck(hasDifficultWords ? 'warning' : 'good');
-    } else {
-      setVocabularyCheck(null);
-    }
   }, [content]);
 
   const handleSubmit = () => {
     const writingTime = startTime ? Math.floor((new Date().getTime() - startTime.getTime()) / 1000) : 0;
-    const vocabularyScore = vocabularyCheck === 'good' ? 85 : 65;
 
     onSubmit({
       title,
       content,
-      vocabularyScore,
+      // vocabularyScore,
       writingTime,
-      image: selectedImage || undefined,
+      // image: selectedImage || undefined,
     });
   };
 
@@ -65,16 +56,17 @@ export function DiaryPostScreen({ onBack, onSubmit }: DiaryPostScreenProps) {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setSelectedImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
-    }
-  };
+  {/* TODO: 画像アップロード機能実装 */}
+  // const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onloadend = () => {
+  //       setSelectedImage(reader.result as string);
+  //     };
+  //     reader.readAsDataURL(file);
+  //   }
+  // };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -128,35 +120,9 @@ export function DiaryPostScreen({ onBack, onSubmit }: DiaryPostScreenProps) {
             <p className="text-sm text-gray-500 mt-1">{content.length}文字</p>
           </div>
 
-          {/* Vocabulary Check */}
-          {vocabularyCheck && (
-            <div className={`flex items-start gap-3 p-4 rounded-lg mb-6 ${
-              vocabularyCheck === 'good' 
-                ? 'bg-green-50 border border-green-200' 
-                : 'bg-yellow-50 border border-yellow-200'
-            }`}>
-              {vocabularyCheck === 'good' ? (
-                <>
-                  <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-green-900">良好な語彙レベル</p>
-                    <p className="text-sm text-green-700">わかりやすく、日常的な言葉で書けています</p>
-                  </div>
-                </>
-              ) : (
-                <>
-                  <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-                  <div>
-                    <p className="text-yellow-900">難しい語彙が含まれています</p>
-                    <p className="text-sm text-yellow-700">よりシンプルな言葉で書き直してみましょう</p>
-                  </div>
-                </>
-              )}
-            </div>
-          )}
-
+          {/* TODO: 画像アップロード機能実装 */}
           {/* Image Upload */}
-          <div className="mb-6">
+          {/* <div className="mb-6">
             <label className="block text-gray-700 mb-2">写真を追加</label>
             <div className="flex items-center gap-4">
               {selectedImage ? (
@@ -186,26 +152,16 @@ export function DiaryPostScreen({ onBack, onSubmit }: DiaryPostScreenProps) {
                 </label>
               )}
             </div>
-          </div>
+          </div> */}
 
           {/* Submit Button */}
           <button
             onClick={handleSubmit}
-            disabled={!title || !content || content.length < 20}
+            disabled={!title || !content || content.length < 1}
             className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
             確認画面へ進む
           </button>
-        </div>
-
-        {/* Tips */}
-        <div className="bg-blue-50 rounded-xl p-4 border border-blue-200">
-          <h3 className="text-blue-900 mb-2">💡 ヒント</h3>
-          <ul className="text-sm text-blue-800 space-y-1">
-            <li>• 時間制限内に書くことで、集中力を鍛えます</li>
-            <li>• 日常的な言葉を使うことで、認知機能を維持します</li>
-            <li>• 毎日続けることが大切です</li>
-          </ul>
         </div>
       </div>
     </div>
