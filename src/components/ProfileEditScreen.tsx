@@ -72,8 +72,8 @@ export function ProfileEditScreen({ onBack }: ProfileEditScreenProps) {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* アバター */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <div className="flex items-center gap-6">
+          {/* <div className="bg-white rounded-xl border border-gray-200 p-6"> */}
+            {/* <div className="flex items-center gap-6">
               <div className="relative">
                 <button
                   type="button"
@@ -100,10 +100,10 @@ export function ProfileEditScreen({ onBack }: ProfileEditScreenProps) {
                   アイコンを変更
                 </button>
               </div>
-            </div>
+            </div> */}
 
             {/* アバター選択 */}
-            {showAvatarPicker && (
+            {/* {showAvatarPicker && (
               <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
                 <p className="text-sm text-gray-700 mb-3">アイコンを選択：</p>
                 <div className="grid grid-cols-8 gap-2">
@@ -123,8 +123,8 @@ export function ProfileEditScreen({ onBack }: ProfileEditScreenProps) {
                   ))}
                 </div>
               </div>
-            )}
-          </div>
+            )} */}
+          {/* </div> */}
 
           {/* 基本情報 */}
           <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
