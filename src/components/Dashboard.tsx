@@ -46,7 +46,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
       {/* Header */}
       <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
-          <h1 className="text-indigo-600">FamBrain</h1>
+          <h1 className="text-indigo-600">FamDiaryLog</h1>
           <button
             onClick={() => onNavigate("settings")}
             className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
@@ -105,7 +105,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           className="w-full bg-white border-2 border-indigo-200 text-indigo-600 py-3 rounded-xl hover:bg-indigo-50 transition-colors flex items-center justify-center gap-2"
         >
           <TrendingUp className="w-5 h-5" />
-          <span>認知機能ダッシュボード</span>
+          <span>執筆レポート</span>
         </button>
 
         {/* Recent Posts */}
