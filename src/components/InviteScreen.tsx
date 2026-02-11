@@ -93,46 +93,6 @@ export function InviteScreen({ onBack }: InviteScreenProps) {
       </header>
 
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
-        {/* 招待URL */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6">
-          <div className="flex items-center gap-3 mb-4">
-            <LinkIcon className="w-5 h-5 text-indigo-600" />
-            <h3 className="text-gray-900">招待URL</h3>
-          </div>
-          
-          <p className="text-gray-600 mb-4">
-            このURLを家族に共有して、FamBrainグループに招待しましょう
-          </p>
-          
-          <div className="flex items-center gap-3 mb-6">
-            <div className="flex-1 px-4 py-3 bg-gray-50 rounded-lg border border-gray-200 break-all text-gray-900">
-              {inviteUrl}
-            </div>
-            <button
-              onClick={copyUrl}
-              className="p-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors flex items-center gap-2 whitespace-nowrap"
-            >
-              {copied ? (
-                <>
-                  <Check className="w-5 h-5" />
-                  <span className="hidden sm:inline">コピー済み</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="w-5 h-5" />
-                  <span className="hidden sm:inline">コピー</span>
-                </>
-              )}
-            </button>
-          </div>
-
-          <div className="bg-indigo-50 rounded-lg p-4 border border-indigo-200">
-            <p className="text-sm text-indigo-900">
-              💡 このURLは7日間有効です。期限切れ後は新しいURLを発行してください。
-            </p>
-          </div>
-        </div>
-
         {/* メールで送信 */}
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <div className="flex items-center gap-3 mb-4">
@@ -246,10 +206,9 @@ export function InviteScreen({ onBack }: InviteScreenProps) {
         <div className="bg-amber-50 rounded-xl border border-amber-200 p-6">
           <h4 className="text-amber-900 mb-3">⚠️ 注意事項</h4>
           <ul className="space-y-2 text-sm text-amber-800">
-            <li>• 招待URLは信頼できる家族のみに共有してください</li>
-            <li>• URLを受け取った人は申請後、管理者の承認が必要です</li>
-            <li>• 1つのURLで複数人が申請できます</li>
-            <li>• セキュリティのため、定期的に新しいURLを発行することをお勧めします</li>
+            <li>• 家族へ参加してもらうには、申請後、管理者の承認が必要です</li>
+            <li>• 招待URLの有効期限は発行から7日間です</li>
+            <li>• 複数回メールを送信した場合、最新のURLのみ有効です</li>
           </ul>
         </div>
       </div>
