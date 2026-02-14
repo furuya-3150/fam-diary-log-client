@@ -11,6 +11,7 @@ export interface AuthState {
   user: User | null;
   loading: boolean;
   isAuthenticated: boolean;
+  isBelongsToFamily: boolean;
 }
 
 export interface AuthContextType extends AuthState {

@@ -1,8 +1,8 @@
 import { jwtVerify, SignJWT } from "jose";
+import { serverEnv } from "./env";
 
-const JWT_SECRET = new TextEncoder().encode(
-  process.env.JWT_SECRET || "your-secret-key-change-this-in-production",
-);
+// const JWT_SECRET = new TextEncoder().encode("your-secret-key-change-this-in-production"); // ここは環境変数から取得するべきですが、デバッグのために直接定義しています
+const JWT_SECRET = new TextEncoder().encode(serverEnv.jwtSecret);
 
 // JWTのペイロード型定義
 export interface JWTPayload {

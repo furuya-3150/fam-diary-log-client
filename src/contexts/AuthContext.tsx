@@ -76,6 +76,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     user,
     loading,
     isAuthenticated: !!user,
+    isBelongsToFamily: !!user?.familyId,
     login,
     logout,
     refetch: fetchUser,

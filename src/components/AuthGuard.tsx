@@ -3,6 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { Loading } from "@/components/ui/loading";
 
 interface AuthGuardProps {
   children: React.ReactNode;
@@ -48,7 +49,7 @@ export function AuthGuard({
   adminOnly = false,
   redirectTo = "/",
   fallback = <AuthGuardFallback />,
-}: AuthGuardProps) {
+}: Readonly<AuthGuardProps>) {
   const { isAuthenticated, loading, hasPermission, isAdmin } = useAuth();
   const router = useRouter();
 
@@ -65,13 +66,11 @@ export function AuthGuard({
     // 管理者権限が必要な場合
     if (adminOnly && !isAdmin()) {
       router.push("/unauthorized");
-      return;
     }
 
     // 特定の権限が必要な場合
     if (requiredPermission && !hasPermission(requiredPermission)) {
       router.push("/unauthorized");
-      return;
     }
   }, [
     isAuthenticated,
@@ -110,12 +109,5 @@ export function AuthGuard({
  * デフォルトのローディング表示
  */
 function AuthGuardFallback() {
-  return (
-    <div className="flex items-center justify-center min-h-screen">
-      <div className="text-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto mb-4"></div>
-        <p className="text-gray-600">認証状態を確認中...</p>
-      </div>
-    </div>
-  );
+  return <Loading message="認証状態を確認中..." fullScreen />;
 }
