@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import { PenSquare, TrendingUp, Settings, Award, Clock } from "lucide-react";
 import { Screen } from "../types";
+import { useAuth } from "@/contexts/AuthContext";
+import { Loading } from "./ui/loading";
+import { useRouter } from "next/navigation";
 
 interface DashboardProps {
   onNavigate: (screen: Screen) => void;
@@ -41,6 +44,15 @@ const mockPosts = [
 ];
 
 export function Dashboard({ onNavigate }: DashboardProps) {
+  const router = useRouter();
+  const { loading, isAuthenticated } = useAuth();
+  if (loading) {
+    return <Loading message="認証状態を確認中..." fullScreen gradient />;
+  }
+  if (!isAuthenticated) {
+    router.push("/");
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}

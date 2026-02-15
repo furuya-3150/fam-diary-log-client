@@ -206,7 +206,6 @@ export function InviteScreen({ onBack }: InviteScreenProps) {
         <div className="bg-amber-50 rounded-xl border border-amber-200 p-6">
           <h4 className="text-amber-900 mb-3">⚠️ 注意事項</h4>
           <ul className="space-y-2 text-sm text-amber-800">
-            <li>• 家族へ参加してもらうには、申請後、管理者の承認が必要です</li>
             <li>• 招待URLの有効期限は発行から7日間です</li>
             <li>• 複数回メールを送信した場合、最新のURLのみ有効です</li>
           </ul>

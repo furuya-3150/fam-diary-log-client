@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { COOKIE_AUTH_TOKEN } from "../me/route";
 
 /**
  * POST /api/auth/logout
@@ -8,7 +9,7 @@ export async function POST() {
   const response = NextResponse.json({ success: true });
 
   // auth_token Cookieを削除
-  response.cookies.set("auth_token", "", {
+  response.cookies.set(COOKIE_AUTH_TOKEN, "", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "strict",

@@ -6,7 +6,7 @@ const JWT_SECRET = new TextEncoder().encode(serverEnv.jwtSecret);
 
 // JWTのペイロード型定義
 export interface JWTPayload {
-  userId: string;
+  sub: string;
   role?: "admin" | "member";
   familyId?: string;
   iat?: number;
@@ -22,11 +22,13 @@ export async function verifyToken(token: string): Promise<JWTPayload> {
       algorithms: ["HS256"],
     });
 
+  console.log("Token payload:", payload); // デバッグ用ログ
+
     // joseのJWTPayloadから独自のJWTPayloadに変換
     return {
-      userId: payload.userId as string,
+      sub: payload.sub as string,
       role: payload.role as "admin" | "member" | undefined,
-      familyId: payload.familyId as string | undefined,
+      familyId: payload.family_id as string | undefined,
       iat: payload.iat,
       exp: payload.exp,
     };

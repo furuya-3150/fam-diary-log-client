@@ -2,7 +2,7 @@ import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { verifyToken } from "@/lib/auth";
 
-const COOKIE_AUTH_TOKEN = "auth_token";
+export const COOKIE_AUTH_TOKEN = "auth_token";
 const DEFAULT_ROLE = "member";
 
 /**
@@ -25,7 +25,7 @@ export async function GET() {
     // ユーザー情報を返す
     return NextResponse.json({
       user: {
-        id: payload.userId,
+        id: payload.sub,
         role: payload.role || DEFAULT_ROLE,
         familyId: payload.familyId || null,
       },

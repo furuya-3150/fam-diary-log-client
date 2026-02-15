@@ -24,6 +24,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
+        console.log("Fetched user:", data);
         setUser(data.user);
       } else {
         setUser(null);
@@ -57,7 +58,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   // 権限チェック
   const hasPermission = (permission: string): boolean => {
-    return user?.permissions.includes(permission) ?? false;
+    return user?.permissions?.includes(permission) ?? false;
   };
 
   // 管理者チェック

@@ -1,32 +1,31 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
 import { CreateFamilyScreen } from '../../components/CreateFamilyScreen';
+import { useAuth } from '@/contexts/AuthContext';
+import { Loading } from '@/components/ui/loading';
 
 export default function CreateFamilyPage() {
   const router = useRouter();
+  const { loading, isBelongsToFamily } = useAuth();
 
-  useEffect(() => {
-    // 認証チェック
-  }, [router]);
+  if (loading) {
+    return <Loading message="認証状態を確認中..." fullScreen gradient />;
+  }
 
   const handleBack = () => {
-    sessionStorage.removeItem('isAuthenticated');
-    router.push('/');
+    router.push('/dashboard');
   };
 
   const handleCreateFamily = (familyName: string) => {
     console.log('Creating family:', familyName);
-    sessionStorage.setItem('hasFamily', 'true');
-    sessionStorage.setItem('familyName', familyName);
     router.push('/dashboard');
   };
 
-  return (
+  return isBelongsToFamily ? (
     <CreateFamilyScreen 
       onBack={handleBack}
       onCreateFamily={handleCreateFamily}
     />
-  );
+  ) : null;
 }

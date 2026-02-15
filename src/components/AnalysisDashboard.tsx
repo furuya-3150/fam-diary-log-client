@@ -265,19 +265,19 @@ export function AnalysisDashboard({ onBack }: AnalysisDashboardProps) {
 
           {/* Badges */}
           <UITooltip>
-            <div className="bg-gray-400 rounded-xl p-6 border border-gray-200">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-gray-900 flex items-center gap-2">
-                  <Award className="w-5 h-5 text-yellow-500" />
-                  達成バッジ
-                </h3>
-                <TooltipTrigger asChild>
+            <TooltipTrigger asChild>
+              <div className="bg-gray-400 hover:bg-gray-500 rounded-xl p-6 border border-gray-200">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-gray-900 flex items-center gap-2">
+                    <Award className="w-5 h-5 text-yellow-500" />
+                    達成バッジ
+                  </h3>
+                  {/* <TooltipTrigger asChild>
                   <div className="text-sm text-gray-700"></div>
-                </TooltipTrigger>
-              </div>
+                </TooltipTrigger> */}
+                </div>
 
-              <TooltipTrigger asChild>
-                <div className="space-y-3 cursor-help" aria-hidden>
+                {/* <div className="space-y-3 cursor-help" aria-hidden>
                   {badges.map((badge) => (
                     <div
                       key={badge.id}
@@ -290,18 +290,17 @@ export function AnalysisDashboard({ onBack }: AnalysisDashboardProps) {
                           {badge.description}
                         </p>
                       </div>
-                      {/* {badge.unlocked && (
+                      {badge.unlocked && (
                         <Award className="w-5 h-5 text-yellow-500" />
-                      )} */}
+                      )}
                     </div>
                   ))}
-                </div>
-              </TooltipTrigger>
-
-              <TooltipContent sideOffset={8}>
-                <span>近日公開</span>
-              </TooltipContent>
-            </div>
+                </div> */}
+              </div>
+            </TooltipTrigger>
+            <TooltipContent sideOffset={8}>
+              <span>近日公開</span>
+            </TooltipContent>
           </UITooltip>
         </div>
       </div>

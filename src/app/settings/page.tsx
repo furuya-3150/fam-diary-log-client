@@ -1,9 +1,10 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { redirect, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { SettingsScreen } from '../../components/SettingsScreen';
 import type { Screen } from '../../types';
+import { toast } from 'sonner';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -16,30 +17,28 @@ export default function SettingsPage() {
     router.push('/dashboard');
   };
 
-  const handleLogout = () => {
-    sessionStorage.removeItem('isAuthenticated');
-    sessionStorage.removeItem('hasFamily');
-    sessionStorage.removeItem('familyName');
-    sessionStorage.removeItem('currentPost');
-    router.push('/');
+  const handleLogout = async () => {
+    const response = await fetch("/api/auth/logout", {
+      method: "POST",
+      credentials: "include", // Cookieを送信
+    });
+    if (response.ok) {
+      window.location.href = "/"; // ログアウト後にトップページへリダイレクト
+    } else {
+      console.error("Logout failed");
+      toast.error("ログアウトに失敗しました。もう一度お試しください。");
+    }
   };
 
   const handleNavigate = (screen: Screen) => {
     const screenRoutes: Record<Screen, string> = {
       'login': '/',
-      'google-auth': '/auth/google',
-      'facebook-auth': '/auth/facebook',
       'create-family': '/create-family',
       'dashboard': '/dashboard',
       'post': '/post',
-      'confirm': '/confirm',
       'analysis': '/analysis',
       'settings': '/settings',
       'invite': '/settings/invite',
-      'notifications': '/settings/notifications',
-      'two-factor-auth': '/settings/two-factor-auth',
-      'password-change': '/settings/password-change',
-      'login-history': '/settings/login-history',
       'profile-edit': '/settings/profile-edit',
     };
 
