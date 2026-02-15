@@ -1,9 +1,9 @@
 export interface User {
   id: string;
-  email: string;
+  email?: string;
   name?: string;
-  role: "admin" | "user";
-  permissions: string[];
+  role?: "admin" | "user";
+  permissions?: string[];
   familyId?: string;
 }
 
