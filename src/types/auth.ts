@@ -15,7 +15,6 @@ export interface AuthState {
 }
 
 export interface AuthContextType extends AuthState {
-  login: (token: string) => Promise<void>;
   logout: () => Promise<void>;
   refetch: () => Promise<void>;
   hasPermission: (permission: string) => boolean;

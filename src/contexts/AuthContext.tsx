@@ -41,13 +41,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     fetchUser();
   }, [fetchUser]);
 
-  // ログイン処理
-  const login = async (token: string) => {
-    // トークンはサーバー側で既にCookieに設定されている前提
-    // クライアント側では単にユーザー情報を再取得
-    await fetchUser();
-  };
-
   // ログアウト処理
   const logout = async () => {
     try {
@@ -77,7 +70,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     loading,
     isAuthenticated: !!user,
     isBelongsToFamily: !!user?.familyId,
-    login,
     logout,
     refetch: fetchUser,
     hasPermission,
