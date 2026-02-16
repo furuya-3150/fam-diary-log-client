@@ -1,8 +1,9 @@
+"use server";
+
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { verifyToken } from "@/lib/auth";
+import { COOKIE_AUTH_TOKEN, verifyToken } from "@/lib/auth";
 
-export const COOKIE_AUTH_TOKEN = "auth_token";
 const DEFAULT_ROLE = "member";
 
 /**

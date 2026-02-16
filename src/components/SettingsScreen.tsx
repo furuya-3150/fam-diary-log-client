@@ -88,7 +88,6 @@ export function SettingsScreen({
         <NotificationSettingsSection
           show={isBelongsToFamily}
           onChange={(settings) => {
-            console.log("Notification settings changed:", settings);
           }}
         />
 

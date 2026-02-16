@@ -6,51 +6,66 @@ import { Screen } from "../types";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loading } from "./ui/loading";
 import { useRouter } from "next/navigation";
+import { getTodayDiaries, type DiaryPost } from "@/lib/actions/diaries";
+import { ErrorDisplay } from "./ui/error-display";
 
 interface DashboardProps {
   onNavigate: (screen: Screen) => void;
 }
 
-const mockPosts = [
-  {
-    id: "1",
-    title: "今日の散歩",
-    content:
-      "朝の公園は気持ちが良かった。桜の花びらが風に舞っていて、春の訪れを感じました。",
-    author: "お母さん",
-    timestamp: new Date("2025-12-07T09:30:00"),
-    image: "https://images.unsplash.com/photo-1522926193341-e9ffd686c60f?w=400",
-    vocabularyScore: 85,
-  },
-  {
-    id: "2",
-    title: "孫との時間",
-    content:
-      "今日は孫が遊びに来てくれました。一緒に折り紙を折って、楽しい時間を過ごせました。",
-    author: "お父さん",
-    timestamp: new Date("2025-12-06T15:20:00"),
-    vocabularyScore: 78,
-  },
-  {
-    id: "3",
-    title: "料理の思い出",
-    content:
-      "昔よく作っていたカレーを久しぶりに作りました。家族みんなが喜んでくれて嬉しかったです。",
-    author: "おばあちゃん",
-    timestamp: new Date("2025-12-05T12:10:00"),
-    image: "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=400",
-    vocabularyScore: 82,
-  },
-];
-
 export function Dashboard({ onNavigate }: DashboardProps) {
   const router = useRouter();
   const { loading, isAuthenticated } = useAuth();
+  const [posts, setPosts] = useState<DiaryPost[]>([]);
+  const [loadingPosts, setLoadingPosts] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // 日記データの取得
+  useEffect(() => {
+    if (!isAuthenticated || loading) return;
+
+    const fetchDiaries = async () => {
+      try {
+        setLoadingPosts(true);
+        setError(null);
+        const diaries = await getTodayDiaries(); // 今日の日記
+        setPosts(diaries);
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error ? err.message : "日記の取得に失敗しました";
+        setError(errorMessage);
+      } finally {
+        setLoadingPosts(false);
+      }
+    };
+
+    fetchDiaries();
+  }, [isAuthenticated, loading]);
+
   if (loading) {
     return <Loading message="認証状態を確認中..." fullScreen gradient />;
   }
+
   if (!isAuthenticated) {
     router.push("/");
+    return null;
+  }
+
+  // データ読み込み中
+  if (loadingPosts) {
+    return <Loading message="日記を読み込み中..." fullScreen gradient />;
+  }
+
+  // エラー時は全画面でエラー表示
+  if (error) {
+    return (
+      <ErrorDisplay
+        message={error}
+        title="日記の取得に失敗しました"
+        iconType="error"
+        onButtonClick={() => globalThis.location.reload()}
+      />
+    );
   }
 
   return (
@@ -122,49 +137,61 @@ export function Dashboard({ onNavigate }: DashboardProps) {
 
         {/* Recent Posts */}
         <div>
-          <h2 className="text-gray-900 mb-4">家族の最新投稿</h2>
+          <h2 className="text-gray-900 mb-4">家族の今日の投稿</h2>
 
-          <div className="space-y-4">
-            {mockPosts.map((post) => (
-              <div
-                key={post.id}
-                className="bg-white rounded-xl p-4 border border-gray-200 hover:shadow-md transition-shadow"
+          {posts.length === 0 ? (
+            <div className="bg-white rounded-xl p-8 border border-gray-200 text-center">
+              <p className="text-gray-500 mb-4">まだ日記がありません</p>
+              <button
+                onClick={() => onNavigate("post")}
+                className="text-indigo-600 hover:text-indigo-700 font-medium"
               >
-                <div className="flex items-start gap-4">
-                  {post.image && (
-                    <img
-                      src={post.image}
-                      alt=""
-                      className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
-                    />
-                  )}
+                最初の日記を書く
+              </button>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {posts.map((post) => (
+                <div
+                  key={post.id}
+                  className="bg-white rounded-xl p-4 border border-gray-200 hover:shadow-md transition-shadow"
+                >
+                  <div className="flex items-start gap-4">
+                    {post.image && (
+                      <img
+                        src={post.image}
+                        alt=""
+                        className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
+                      />
+                    )}
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-1">
-                      <h3 className="text-gray-900">{post.title}</h3>
-                      <div className="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
-                        <Award className="w-3 h-3" />
-                        <span>{post.vocabularyScore}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="text-gray-900">{post.title}</h3>
+                        <div className="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
+                          <Award className="w-3 h-3" />
+                          {/* <span>{post.vocabularyScore}</span> */}
+                        </div>
                       </div>
-                    </div>
 
-                    <p className="text-gray-600 text-sm mb-2 line-clamp-2">
-                      {post.content}
-                    </p>
+                      <p className="text-gray-600 text-sm mb-2 line-clamp-2">
+                        {post.content}
+                      </p>
 
-                    <div className="flex items-center gap-3 text-sm text-gray-500">
-                      <span>{post.author}</span>
-                      <span>•</span>
-                      <div className="flex items-center gap-1">
-                        <Clock className="w-4 h-4" />
-                        <TimeAgo timestamp={post.timestamp} />
+                      <div className="flex items-center gap-3 text-sm text-gray-500">
+                        <span>{post.author}</span>
+                        <span>•</span>
+                        <div className="flex items-center gap-1">
+                          <Clock className="w-4 h-4" />
+                          <TimeAgo timestamp={post.timestamp} />
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

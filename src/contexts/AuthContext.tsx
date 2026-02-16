@@ -24,13 +24,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Fetched user:", data);
         setUser(data.user);
       } else {
         setUser(null);
       }
     } catch (error) {
-      console.error("Failed to fetch user:", error);
       setUser(null);
     } finally {
       setLoading(false);
