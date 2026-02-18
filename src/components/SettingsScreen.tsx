@@ -11,6 +11,10 @@ import { AccountSection } from "./settings/AccountSection";
 import { LogoutButton } from "./settings/LogoutButton";
 import { AppInfo } from "./settings/AppInfo";
 import { getFamilyMembers } from "@/lib/actions/members";
+import {
+  getNotificationSettings,
+  type NotificationSettings,
+} from "@/lib/actions/settings";
 
 interface SettingsScreenProps {
   onBack: () => void;
@@ -34,6 +38,9 @@ export function SettingsScreen({
     }>
   >([]);
   const [loadingMembers, setLoadingMembers] = useState(true);
+  const [notificationSettings, setNotificationSettings] =
+    useState<NotificationSettings | null>(null);
+  const [loadingSettings, setLoadingSettings] = useState(true);
 
   // メンバー情報を取得
   useEffect(() => {
@@ -64,7 +71,26 @@ export function SettingsScreen({
     fetchMembers();
   }, [isBelongsToFamily, loading]);
 
-  if (loading || loadingMembers) {
+  // 通知設定を取得
+  useEffect(() => {
+    if (!isBelongsToFamily || loading) return;
+
+    const fetchSettings = async () => {
+      try {
+        setLoadingSettings(true);
+        const settings = await getNotificationSettings();
+        setNotificationSettings(settings);
+      } catch (error) {
+        console.error("通知設定取得エラー:", error);
+      } finally {
+        setLoadingSettings(false);
+      }
+    };
+
+    fetchSettings();
+  }, [isBelongsToFamily, loading]);
+
+  if (loading || loadingMembers || loadingSettings) {
     return <Loading message="読み込み中..." fullScreen gradient />;
   }
 
@@ -97,6 +123,7 @@ export function SettingsScreen({
 
         <NotificationSettingsSection
           show={isBelongsToFamily}
+          initialSettings={notificationSettings || undefined}
           onChange={(settings) => {}}
         />
 

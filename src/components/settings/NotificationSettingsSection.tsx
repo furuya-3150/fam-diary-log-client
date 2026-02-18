@@ -1,9 +1,6 @@
 import { Bell } from "lucide-react";
 import { useState } from "react";
-
-interface NotificationSettings {
-  newPost: boolean;
-}
+import { type NotificationSettings } from "@/lib/actions/settings";
 
 interface NotificationSettingsSectionProps {
   show: boolean;
@@ -25,7 +22,7 @@ interface NotificationSettingsSectionProps {
 export function NotificationSettingsSection({
   show = true,
   initialSettings = {
-    newPost: false,
+    postCreatedEnabled: false,
   },
   onChange,
 }: Readonly<NotificationSettingsSectionProps>) {
@@ -57,8 +54,10 @@ export function NotificationSettingsSection({
           </div>
           <input
             type="checkbox"
-            checked={settings.newPost}
-            onChange={(e) => handleToggle("newPost", e.target.checked)}
+            checked={settings.postCreatedEnabled}
+            onChange={(e) =>
+              handleToggle("postCreatedEnabled", e.target.checked)
+            }
             className="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500"
             aria-label="新しい投稿の通知を有効にする"
           />
