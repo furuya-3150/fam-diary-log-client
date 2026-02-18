@@ -78,10 +78,6 @@ export function FamilyManagementSection({
               </div>
               <div>
                 <p className="text-gray-900 font-medium">{member.name}</p>
-                <div className="flex items-center gap-2 text-sm text-gray-600">
-                  <Mail className="w-3 h-3" />
-                  <span>{member.email}</span>
-                </div>
               </div>
             </div>
             <div className="flex items-center gap-3">

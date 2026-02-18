@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Screen } from "@/types";
 import { ArrowLeft } from "lucide-react";
@@ -9,6 +10,7 @@ import { NotificationSettingsSection } from "./settings/NotificationSettingsSect
 import { AccountSection } from "./settings/AccountSection";
 import { LogoutButton } from "./settings/LogoutButton";
 import { AppInfo } from "./settings/AppInfo";
+import { getFamilyMembers } from "@/lib/actions/members";
 
 interface SettingsScreenProps {
   onBack: () => void;
@@ -16,46 +18,54 @@ interface SettingsScreenProps {
   onNavigate?: (screen: Screen) => void;
 }
 
-const mockFamilyMembers = [
-  {
-    id: "1",
-    name: "お母さん",
-    email: "mother@example.com",
-    role: "管理者",
-    avatar: "👩",
-  },
-  {
-    id: "2",
-    name: "お父さん",
-    email: "father@example.com",
-    role: "メンバー",
-    avatar: "👨",
-  },
-  {
-    id: "3",
-    name: "太郎",
-    email: "taro@example.com",
-    role: "メンバー",
-    avatar: "👦",
-  },
-  {
-    id: "4",
-    name: "花子",
-    email: "hanako@example.com",
-    role: "メンバー",
-    avatar: "👧",
-  },
-];
-
 export function SettingsScreen({
   onBack,
   onLogout,
   onNavigate,
 }: Readonly<SettingsScreenProps>) {
   const { loading, isBelongsToFamily, isAdmin } = useAuth();
+  const [familyMembers, setFamilyMembers] = useState<
+    Array<{
+      id: string;
+      name: string;
+      email: string;
+      role: string;
+      avatar: string;
+    }>
+  >([]);
+  const [loadingMembers, setLoadingMembers] = useState(true);
 
-  if (loading) {
-    return <Loading message="認証状態を確認中..." fullScreen gradient />;
+  // メンバー情報を取得
+  useEffect(() => {
+    if (!isBelongsToFamily || loading) return;
+
+    const fetchMembers = async () => {
+      try {
+        setLoadingMembers(true);
+        const members = await getFamilyMembers("id,name,role");
+
+        // APIレスポンスをFamilyMember型に変換
+        const formattedMembers = members.map((member) => ({
+          id: member.id,
+          name: member.name,
+          email: member.email || "",
+          role: member.role || "メンバー",
+          avatar: "👤", // デフォルトアバター
+        }));
+
+        setFamilyMembers(formattedMembers);
+      } catch (error) {
+        console.error("メンバー取得エラー:", error);
+      } finally {
+        setLoadingMembers(false);
+      }
+    };
+
+    fetchMembers();
+  }, [isBelongsToFamily, loading]);
+
+  if (loading || loadingMembers) {
+    return <Loading message="読み込み中..." fullScreen gradient />;
   }
 
   return (
@@ -79,7 +89,7 @@ export function SettingsScreen({
 
       <div className="max-w-4xl mx-auto px-4 py-6 space-y-6">
         <FamilyManagementSection
-          members={mockFamilyMembers}
+          members={familyMembers}
           onInvite={() => onNavigate?.("invite")}
           show={isBelongsToFamily}
           isAdmin={isAdmin()}
@@ -87,8 +97,7 @@ export function SettingsScreen({
 
         <NotificationSettingsSection
           show={isBelongsToFamily}
-          onChange={(settings) => {
-          }}
+          onChange={(settings) => {}}
         />
 
         <AccountSection

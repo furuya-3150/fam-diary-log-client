@@ -6,6 +6,8 @@ import { getApiUrl } from "@/lib/env";
 export interface MemberApiResponse {
   id: string;
   name: string;
+  role?: string;
+  email?: string;
 }
 
 /**
