@@ -18,7 +18,6 @@ export default function CreateFamilyPage() {
   };
 
   const handleCreateFamily = (familyName: string) => {
-    console.log('Creating family:', familyName);
     router.push('/dashboard');
   };
 
