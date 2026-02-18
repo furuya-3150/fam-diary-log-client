@@ -9,6 +9,7 @@ export const env = {
    */
   apiUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8082",
   diaryApiUrl: process.env.NEXT_PUBLIC_DIARY_URL || "http://localhost:8080",
+  diaryAnalysisApiUrl: process.env.NEXT_PUBLIC_DIARY_ANALYSIS_URL || "http://localhost:8081",
 
   /**
    * 現在の環境
@@ -49,6 +50,12 @@ export function getApiUrl(path: string): string {
 
 export function getDiaryApiUrl(path: string): string {
   const baseUrl = env.diaryApiUrl.replace(/\/$/, ""); // 末尾のスラッシュを削除
+  const cleanPath = path.startsWith("/") ? path : `/${path}`;
+  return `${baseUrl}${cleanPath}`;
+}
+
+export function getDiaryAnalysisApiUrl(path: string): string {
+  const baseUrl = env.diaryAnalysisApiUrl.replace(/\/$/, ""); // 末尾のスラッシュを削除
   const cleanPath = path.startsWith("/") ? path : `/${path}`;
   return `${baseUrl}${cleanPath}`;
 }

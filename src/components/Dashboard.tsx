@@ -6,8 +6,16 @@ import { Screen } from "../types";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loading } from "./ui/loading";
 import { useRouter } from "next/navigation";
-import { getTodayDiaries, type DiaryPost } from "@/lib/actions/diaries";
+import {
+  getTodayDiaries,
+  getMonthlyDiariesCount,
+  getDiaryStreak,
+  getWeeklyAccuracyScore,
+  type DiaryPost,
+  calculateWeeklyAverage,
+} from "@/lib/actions/diaries";
 import { ErrorDisplay } from "./ui/error-display";
+import { useMembers } from "@/contexts/MembersContext";
 
 interface DashboardProps {
   onNavigate: (screen: Screen) => void;
@@ -16,32 +24,54 @@ interface DashboardProps {
 export function Dashboard({ onNavigate }: DashboardProps) {
   const router = useRouter();
   const { loading, isAuthenticated } = useAuth();
+  const { members: memberNameById, loading: membersLoading } = useMembers();
   const [posts, setPosts] = useState<DiaryPost[]>([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // 日記データの取得
-  useEffect(() => {
-    if (!isAuthenticated || loading) return;
+  // 統計データ
+  const [monthlyCount, setMonthlyCount] = useState<number>(0);
+  const [averageScore, setAverageScore] = useState<number>(0);
+  const [streak, setStreak] = useState<number>(0);
 
-    const fetchDiaries = async () => {
+  // 日記データと統計データの取得
+  useEffect(() => {
+    console.log(
+      "Dashboard: loading=",
+      loading,
+      "isAuthenticated=",
+      isAuthenticated,
+    );
+    if (loading || !isAuthenticated) return;
+
+    const fetchData = async () => {
       try {
         setLoadingPosts(true);
         setError(null);
-        const diaries = await getTodayDiaries(); // 今日の日記
+
+        // 並列で全データを取得
+        const [diaries, count, score, streakDays] = await Promise.all([
+          getTodayDiaries(),
+          getMonthlyDiariesCount(),
+          getWeeklyAccuracyScore(),
+          getDiaryStreak(),
+        ]);
+
         setPosts(diaries);
+        setMonthlyCount(count);
+        setAverageScore(calculateWeeklyAverage(score));
+        setStreak(streakDays);
       } catch (err) {
         const errorMessage =
-          err instanceof Error ? err.message : "日記の取得に失敗しました";
+          err instanceof Error ? err.message : "データの取得に失敗しました";
         setError(errorMessage);
       } finally {
         setLoadingPosts(false);
       }
     };
 
-    fetchDiaries();
-  }, [isAuthenticated, loading]);
-
+    fetchData();
+  }, [loading]);
   if (loading) {
     return <Loading message="認証状態を確認中..." fullScreen gradient />;
   }
@@ -92,7 +122,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                 <PenSquare className="w-5 h-5" />
                 <span>今月の投稿</span>
               </div>
-              <p className="text-gray-900">12回</p>
+              <p className="text-gray-900">{monthlyCount}回</p>
             </div>
           </div>
 
@@ -102,7 +132,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                 <TrendingUp className="w-5 h-5" />
                 <span>平均スコア</span>
               </div>
-              <p className="text-gray-900">82点</p>
+              <p className="text-gray-900">{averageScore}点</p>
             </div>
           </div>
 
@@ -112,7 +142,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
                 <Award className="w-5 h-5" />
                 <span>連続日数</span>
               </div>
-              <p className="text-gray-900">7日</p>
+              <p className="text-gray-900">{streak}日</p>
             </div>
           </div>
         </div>
@@ -151,15 +181,15 @@ export function Dashboard({ onNavigate }: DashboardProps) {
             </div>
           ) : (
             <div className="space-y-4">
-              {posts.map((post) => (
+              {posts.map((diary) => (
                 <div
-                  key={post.id}
+                  key={diary.id}
                   className="bg-white rounded-xl p-4 border border-gray-200 hover:shadow-md transition-shadow"
                 >
                   <div className="flex items-start gap-4">
-                    {post.image && (
+                    {diary.image && (
                       <img
-                        src={post.image}
+                        src={diary.image}
                         alt=""
                         className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
                       />
@@ -167,23 +197,24 @@ export function Dashboard({ onNavigate }: DashboardProps) {
 
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="text-gray-900">{post.title}</h3>
+                        {/* TODO: ユーザーのアイコン */}
+                        <h3 className="text-gray-900">{diary.title}</h3>
                         <div className="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
                           <Award className="w-3 h-3" />
-                          {/* <span>{post.vocabularyScore}</span> */}
+                          {/* <span>{diary.vocabularyScore}</span> */}
                         </div>
                       </div>
 
                       <p className="text-gray-600 text-sm mb-2 line-clamp-2">
-                        {post.content}
+                        {diary.content}
                       </p>
 
                       <div className="flex items-center gap-3 text-sm text-gray-500">
-                        <span>{post.author}</span>
+                        <span>{memberNameById[diary.userId]}</span>
                         <span>•</span>
                         <div className="flex items-center gap-1">
                           <Clock className="w-4 h-4" />
-                          <TimeAgo timestamp={post.timestamp} />
+                          <TimeAgo timestamp={diary.timestamp} />
                         </div>
                       </div>
                     </div>
