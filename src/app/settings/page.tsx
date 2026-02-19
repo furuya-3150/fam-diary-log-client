@@ -1,17 +1,21 @@
 'use client';
 
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { SettingsScreen } from '../../components/SettingsScreen';
 import type { Screen } from '../../types';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
 
 export default function SettingsPage() {
   const router = useRouter();
+  const { loading, isAuthenticated, isBelongsToFamily } = useAuth();
 
   useEffect(() => {
-    // 認証チェック
-  }, [router]);
+    if (!loading && !isAuthenticated) {
+      router.push("/");
+    }
+  }, [loading, isAuthenticated, router]);
 
   const handleBack = () => {
     router.push('/dashboard');
@@ -49,10 +53,11 @@ export default function SettingsPage() {
   };
 
   return (
+    isBelongsToFamily ? 
     <SettingsScreen 
       onBack={handleBack}
       onLogout={handleLogout}
       onNavigate={handleNavigate}
-    />
+    /> : router.push('/dashboard')
   );
 }
