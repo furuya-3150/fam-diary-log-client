@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import {
   ArrowLeft,
   TrendingUp,
@@ -24,73 +25,110 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "./ui/tooltip";
+import { useAuth } from "@/contexts/AuthContext";
+import { Loading } from "./ui/loading";
+import {
+  getWeeklyAccuracyScore,
+  getWeeklyWordCount,
+  getWeeklyWritingTime,
+  getDiaryStreak,
+  calculateWeeklyAverage,
+  convertWeeklyDataToChartData,
+} from "@/lib/actions/diaries";
 
 interface AnalysisDashboardProps {
   onBack: () => void;
 }
 
-const vocabularyData = [
-  { date: "12/1", score: 75 },
-  { date: "12/2", score: 78 },
-  { date: "12/3", score: 82 },
-  { date: "12/4", score: 80 },
-  { date: "12/5", score: 85 },
-  { date: "12/6", score: 83 },
-  { date: "12/7", score: 88 },
-];
+export function AnalysisDashboard({
+  onBack,
+}: Readonly<AnalysisDashboardProps>) {
+  const { loading: authLoading, isAuthenticated } = useAuth();
+  const [loading, setLoading] = useState(true);
 
-const writingSpeedData = [
-  { date: "12/1", words: 120 },
-  { date: "12/2", words: 135 },
-  { date: "12/3", words: 142 },
-  { date: "12/4", words: 138 },
-  { date: "12/5", words: 155 },
-  { date: "12/6", words: 148 },
-  { date: "12/7", words: 160 },
-];
+  // 統計データ
+  const [averageScore, setAverageScore] = useState<number>(0);
+  const [averageWordCount, setAverageWordCount] = useState<number>(0);
+  const [averageWritingTime, setAverageWritingTime] = useState<number>(0);
+  const [streak, setStreak] = useState<number>(0);
 
-const writingTimeData = [
-  { date: "12/1", minutes: 8.5 },
-  { date: "12/2", minutes: 7.8 },
-  { date: "12/3", minutes: 7.2 },
-  { date: "12/4", minutes: 7.5 },
-  { date: "12/5", minutes: 6.8 },
-  { date: "12/6", minutes: 7.0 },
-  { date: "12/7", minutes: 6.5 },
-];
+  // グラフデータ
+  const [vocabularyData, setVocabularyData] = useState<
+    Array<{ date: string; [key: string]: string | number }>
+  >([]);
+  const [writingSpeedData, setWritingSpeedData] = useState<
+    Array<{ date: string; [key: string]: string | number }>
+  >([]);
+  const [writingTimeData, setWritingTimeData] = useState<
+    Array<{ date: string; [key: string]: string | number }>
+  >([]);
 
-const badges = [
-  {
-    id: "1",
-    name: "7日連続",
-    icon: "🔥",
-    description: "7日間連続で投稿",
-    unlocked: true,
-  },
-  {
-    id: "2",
-    name: "語彙マスター",
-    icon: "📚",
-    description: "高スコアを5回達成",
-    unlocked: true,
-  },
-  {
-    id: "3",
-    name: "早書き達人",
-    icon: "⚡",
-    description: "5分以内に投稿を3回達成",
-    unlocked: false,
-  },
-  {
-    id: "4",
-    name: "月間チャンピオン",
-    icon: "🏆",
-    description: "月間30回投稿",
-    unlocked: false,
-  },
-];
+  // データ取得
+  useEffect(() => {
+    if (authLoading || !isAuthenticated) return;
 
-export function AnalysisDashboard({ onBack }: AnalysisDashboardProps) {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+
+        // 並列で全データを取得
+        const [scoreData, wordCountData, writingTimeData, streakDays] =
+          await Promise.all([
+            getWeeklyAccuracyScore(),
+            getWeeklyWordCount(),
+            getWeeklyWritingTime(),
+            getDiaryStreak(),
+          ]);
+
+        // 平均値を計算
+        setAverageScore(calculateWeeklyAverage(scoreData));
+        setAverageWordCount(Math.round(calculateWeeklyAverage(wordCountData)));
+        setAverageWritingTime(calculateWeeklyAverage(writingTimeData));
+        setStreak(streakDays);
+
+        // グラフデータに変換
+        setVocabularyData(convertWeeklyDataToChartData(scoreData, "score"));
+        setWritingSpeedData(
+          convertWeeklyDataToChartData(wordCountData, "words"),
+        );
+        setWritingTimeData(
+          convertWeeklyDataToChartData(writingTimeData, "minutes"),
+        );
+      } catch (error) {
+        console.error("分析データの取得エラー:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [authLoading, isAuthenticated]);
+
+  // グラフ統計情報を計算
+  const getChartStats = (
+    data: Array<{ [key: string]: string | number }>,
+    valueKey: string,
+  ) => {
+    if (data.length === 0) return { avg: 0, max: 0, min: 0 };
+
+    const values = data.map((d) => d[valueKey] as number);
+    const avg =
+      Math.round((values.reduce((sum, v) => sum + v, 0) / values.length) * 10) /
+      10;
+    const max = Math.max(...values);
+    const min = Math.min(...values);
+
+    return { avg, max, min };
+  };
+
+  if (authLoading || loading) {
+    return <Loading message="読み込み中..." fullScreen gradient />;
+  }
+
+  // 各グラフの統計情報
+  const scoreStats = getChartStats(vocabularyData, "score");
+  const wordStats = getChartStats(writingSpeedData, "words");
+  const timeStats = getChartStats(writingTimeData, "minutes");
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
@@ -104,7 +142,7 @@ export function AnalysisDashboard({ onBack }: AnalysisDashboardProps) {
             <span>戻る</span>
           </button>
 
-          <h2 className="text-gray-900">認知機能ダッシュボード</h2>
+          <h2 className="text-gray-900">執筆レポート</h2>
 
           <div className="w-20"></div>
         </div>
@@ -120,13 +158,9 @@ export function AnalysisDashboard({ onBack }: AnalysisDashboardProps) {
               </div>
               <div>
                 <p className="text-sm text-gray-600">平均スコア</p>
-                <p className="text-gray-900">82点</p>
+                <p className="text-gray-900">{averageScore}点</p>
               </div>
             </div>
-            {/* <div className="text-xs text-green-600 flex items-center gap-1">
-              <span>↑ 5%</span>
-              <span className="text-gray-500">先週比</span>
-            </div> */}
           </div>
 
           <div className="bg-white rounded-xl p-4 border border-gray-200">
@@ -136,13 +170,9 @@ export function AnalysisDashboard({ onBack }: AnalysisDashboardProps) {
               </div>
               <div>
                 <p className="text-sm text-gray-600">平均文字数</p>
-                <p className="text-gray-900">145文字</p>
+                <p className="text-gray-900">{averageWordCount}文字</p>
               </div>
             </div>
-            {/* <div className="text-xs text-green-600 flex items-center gap-1">
-              <span>↑ 8%</span>
-              <span className="text-gray-500">先週比</span>
-            </div> */}
           </div>
 
           <div className="bg-white rounded-xl p-4 border border-gray-200">
@@ -152,13 +182,9 @@ export function AnalysisDashboard({ onBack }: AnalysisDashboardProps) {
               </div>
               <div>
                 <p className="text-sm text-gray-600">平均執筆時間</p>
-                <p className="text-gray-900">7.3分</p>
+                <p className="text-gray-900">{averageWritingTime}分</p>
               </div>
             </div>
-            {/* <div className="text-xs text-green-600 flex items-center gap-1">
-              <span>↓ 12%</span>
-              <span className="text-gray-500">短縮</span>
-            </div> */}
           </div>
 
           <div className="bg-white rounded-xl p-4 border border-gray-200">
@@ -168,13 +194,9 @@ export function AnalysisDashboard({ onBack }: AnalysisDashboardProps) {
               </div>
               <div>
                 <p className="text-sm text-gray-600">連続日数</p>
-                <p className="text-gray-900">7日</p>
+                <p className="text-gray-900">{streak}日</p>
               </div>
             </div>
-            {/* <div className="text-xs text-green-600 flex items-center gap-1">
-              <span>🔥</span>
-              <span className="text-gray-500">継続中</span>
-            </div> */}
           </div>
         </div>
 
@@ -206,7 +228,8 @@ export function AnalysisDashboard({ onBack }: AnalysisDashboardProps) {
               </LineChart>
             </ResponsiveContainer>
             <p className="text-sm text-gray-600 mt-4">
-              平均: 82点 • 最高: 88点 • 最低: 75点
+              平均: {scoreStats.avg}点 • 最高: {scoreStats.max}点 • 最低:{" "}
+              {scoreStats.min}点
             </p>
           </div>
 
@@ -229,7 +252,8 @@ export function AnalysisDashboard({ onBack }: AnalysisDashboardProps) {
               </BarChart>
             </ResponsiveContainer>
             <p className="text-sm text-gray-600 mt-4">
-              平均: 145文字 • 最高: 160文字 • 最低: 120文字
+              平均: {wordStats.avg}文字 • 最高: {wordStats.max}文字 • 最低:{" "}
+              {wordStats.min}文字
             </p>
           </div>
 
@@ -259,7 +283,8 @@ export function AnalysisDashboard({ onBack }: AnalysisDashboardProps) {
               </LineChart>
             </ResponsiveContainer>
             <p className="text-sm text-gray-600 mt-4">
-              平均: 7.3分 • 最高: 8.5分 • 最低: 6.5分
+              平均: {timeStats.avg}分 • 最高: {timeStats.max}分 • 最低:{" "}
+              {timeStats.min}分
             </p>
           </div>
 

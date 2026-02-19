@@ -32,6 +32,13 @@ export interface DiaryPost {
 export type WeeklyScoreData = Record<string, number | null>;
 
 /**
+ * 週間データの汎用型
+ * キー: YYYY-MM-DD形式の日付
+ * 値: 数値またはnull（データなし）
+ */
+export type WeeklyData = Record<string, number | null>;
+
+/**
  * 指定日の日記一覧を取得
  * @param targetDate YYYY-MM-DD形式の日付
  */
@@ -165,5 +172,62 @@ export async function getWeeklyAccuracyScore(): Promise<WeeklyScoreData> {
   }
 }
 
+/**
+ * 週間文字数データを取得
+ */
+export async function getWeeklyWordCount(): Promise<WeeklyData> {
+  try {
+    const url = getDiaryAnalysisApiUrl(
+      `/families/me/analyzed-diaries/weekly-char-count?date=${new Date().toISOString().split("T")[0]}`,
+    );
+
+    const response = await fetch(url, {
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error(`週間文字数の取得に失敗しました: ${response.status}`);
+    }
+
+    const { data }: { data: WeeklyData } = await response.json();
+    console.log("週間文字数の取得に成功:", data);
+
+    return data;
+  } catch (error) {
+    console.error("週間文字数の取得エラー:", error);
+    throw error;
+  }
+}
+
+/**
+ * 週間執筆時間データを取得
+ */
+export async function getWeeklyWritingTime(): Promise<WeeklyData> {
+  try {
+    const url = getDiaryAnalysisApiUrl(
+      `/families/me/analyzed-diaries/weekly-writing-time?date=${new Date().toISOString().split("T")[0]}`,
+    );
+
+    const response = await fetch(url, {
+      credentials: "include",
+    });
+
+    if (!response.ok) {
+      throw new Error(`週間執筆時間の取得に失敗しました: ${response.status}`);
+    }
+
+    const { data }: { data: WeeklyData } = await response.json();
+    console.log("週間執筆時間の取得に成功:", data);
+
+    return data;
+  } catch (error) {
+    console.error("週間執筆時間の取得エラー:", error);
+    throw error;
+  }
+}
+
 // ヘルパー関数を再エクスポート
-export { calculateWeeklyAverage } from "@/lib/helpers/diaryHelpers";
+export {
+  calculateWeeklyAverage,
+  convertWeeklyDataToChartData,
+} from "@/lib/helpers/diaryHelpers";
