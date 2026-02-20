@@ -1,6 +1,15 @@
 import { getDiaryAnalysisApiUrl, getDiaryApiUrl } from "@/lib/env";
 
 /**
+ * 日記投稿リクエストの型
+ */
+export interface CreateDiaryRequest {
+  title: string;
+  content: string;
+  writing_time: number; // 執筆時間（秒）
+}
+
+/**
  * サーバーAPIから取得する日記のレスポンス型
  */
 interface DiaryApiResponse {
@@ -56,7 +65,8 @@ export async function getDiaries(targetDate: string): Promise<DiaryPost[]> {
       if (response.status === 401) {
         throw new Error("認証エラー: ログインしてください");
       }
-      throw new Error(`日記の取得に失敗しました: ${response.status}`);
+      const errorData = await response.json();
+      throw new Error(`日記の取得に失敗しました: ${errorData.message}`);
     }
 
     const { data }: { data: DiaryApiResponse[] } = await response.json();
@@ -86,6 +96,38 @@ export async function getTodayDiaries(): Promise<DiaryPost[]> {
 }
 
 /**
+ * 日記を投稿
+ * @param diary 投稿する日記データ
+ * @returns 作成された日記
+ */
+export async function createDiary(diary: CreateDiaryRequest): Promise<void> {
+  try {
+    const url = getDiaryApiUrl("/families/me/diaries");
+
+    const response = await fetch(url, {
+      method: "POST",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(diary),
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error("認証エラー: ログインしてください");
+      }
+      const errorData = await response.json();
+      throw new Error(`日記の投稿に失敗しました: ${errorData.message}`);
+    }
+    // APIレスポンスをクライアント用の型に変換
+  } catch (error) {
+    console.error("日記の投稿エラー:", error);
+    throw error;
+  }
+}
+
+/**
  * 連続投稿日数を取得
  */
 export async function getDiaryStreak(): Promise<number> {
@@ -97,7 +139,8 @@ export async function getDiaryStreak(): Promise<number> {
     });
 
     if (!response.ok) {
-      throw new Error(`連続日数の取得に失敗しました: ${response.status}`);
+      const errorData = await response.json();
+      throw new Error(`連続日数の取得に失敗しました: ${errorData.message}`);
     }
 
     const { data }: { data: { current_streak: number } } =
@@ -133,7 +176,8 @@ export async function getMonthlyDiariesCount(
     });
 
     if (!response.ok) {
-      throw new Error(`投稿数の取得に失敗しました: ${response.status}`);
+      const errorData = await response.json();
+      throw new Error(`投稿数の取得に失敗しました: ${errorData.message}`);
     }
 
     const { data }: { data: { count: number } } = await response.json();
@@ -159,7 +203,8 @@ export async function getWeeklyAccuracyScore(): Promise<WeeklyScoreData> {
     });
 
     if (!response.ok) {
-      throw new Error(`週間スコアの取得に失敗しました: ${response.status}`);
+      const errorData = await response.json();
+      throw new Error(`週間スコアの取得に失敗しました: ${errorData.message}`);
     }
 
     const { data }: { data: WeeklyScoreData } = await response.json();
@@ -186,7 +231,8 @@ export async function getWeeklyWordCount(): Promise<WeeklyData> {
     });
 
     if (!response.ok) {
-      throw new Error(`週間文字数の取得に失敗しました: ${response.status}`);
+      const errorData = await response.json();
+      throw new Error(`週間文字数の取得に失敗しました: ${errorData.message}`);
     }
 
     const { data }: { data: WeeklyData } = await response.json();
@@ -213,7 +259,8 @@ export async function getWeeklyWritingTime(): Promise<WeeklyData> {
     });
 
     if (!response.ok) {
-      throw new Error(`週間執筆時間の取得に失敗しました: ${response.status}`);
+      const errorData = await response.json();
+      throw new Error(`週間執筆時間の取得に失敗しました: ${errorData.message}`);
     }
 
     const { data }: { data: WeeklyData } = await response.json();
