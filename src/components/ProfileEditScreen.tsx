@@ -1,11 +1,12 @@
 "use client";
 
-import { ArrowLeft, User, Mail, Check } from "lucide-react";
+import { ArrowLeft, User, Mail } from "lucide-react";
 import { useState, useEffect } from "react";
-import { getUser } from "@/lib/actions/users";
+import { getUser, updateUser } from "@/lib/actions/users";
 import { useProfileStore } from "@/store/profileStore";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loading } from "./ui/loading";
+import { toast } from "sonner";
 
 interface ProfileEditScreenProps {
   onBack: () => void;
@@ -16,7 +17,6 @@ export function ProfileEditScreen({
 }: Readonly<ProfileEditScreenProps>) {
   const { loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(true);
-  const [success, setSuccess] = useState(false);
   const [userId, setUserId] = useState("");
   const [createdAt, setCreatedAt] = useState("");
 
@@ -55,28 +55,41 @@ export function ProfileEditScreen({
     fetchUser();
   }, [authLoading, setOriginalData]);
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     if (!validateAll()) {
+      toast.error("入力内容を確認してください");
       return;
     }
 
     setSubmitting(true);
 
-    // モック保存（実際の更新APIは別途実装予定）
-    Promise.resolve()
-      .then(() => new Promise((resolve) => setTimeout(resolve, 1000)))
-      .then(() => {
-        setSuccess(true);
-        setTimeout(() => setSuccess(false), 3000);
-      })
-      .catch((error) => {
-        console.error("プロフィール更新エラー:", error);
-      })
-      .finally(() => {
-        setSubmitting(false);
+    try {
+      const updatedUser = await updateUser({
+        name: name.trim(),
+        email: email.trim(),
       });
+
+      // 元データを更新
+      setOriginalData(updatedUser);
+
+      toast.success("プロフィールを更新しました");
+
+      // ダッシュボードに戻る
+      setTimeout(() => {
+        onBack();
+      }, 500);
+    } catch (error) {
+      console.error("プロフィール更新エラー:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "プロフィールの更新に失敗しました",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleCancel = () => {
@@ -108,15 +121,6 @@ export function ProfileEditScreen({
       </header>
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
-        {success && (
-          <div className="bg-green-50 rounded-xl border border-green-200 p-6">
-            <div className="flex items-center gap-3">
-              <Check className="w-6 h-6 text-green-600" />
-              <p className="text-green-900">プロフィールを更新しました</p>
-            </div>
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* 基本情報 */}
           <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">

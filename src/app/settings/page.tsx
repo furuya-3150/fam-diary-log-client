@@ -6,6 +6,7 @@ import { SettingsScreen } from '../../components/SettingsScreen';
 import type { Screen } from '../../types';
 import { toast } from 'sonner';
 import { useAuth } from '@/contexts/AuthContext';
+import { Loading } from '@/components/ui/loading';
 
 export default function SettingsPage() {
   const router = useRouter();
@@ -16,6 +17,10 @@ export default function SettingsPage() {
       router.push("/");
     }
   }, [loading, isAuthenticated, router]);
+
+  if (loading) {
+    return <Loading message="認証状態を確認中..." fullScreen gradient />;
+  }
 
   const handleBack = () => {
     router.push('/dashboard');

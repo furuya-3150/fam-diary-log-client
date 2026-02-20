@@ -107,6 +107,8 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
       error = "メールアドレスを入力してください";
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
       error = "有効なメールアドレスを入力してください";
+    } else if (email.trim().length > 255) {
+      error = "メールアドレスは255文字以内で入力してください";
     }
 
     set((state) => ({

@@ -21,6 +21,14 @@ export interface User {
 }
 
 /**
+ * ユーザー情報更新リクエストの型
+ */
+export interface UpdateUserRequest {
+  name: string;
+  email: string;
+}
+
+/**
  * APIレスポンスをアプリケーション内部の型に変換
  */
 export function convertUser(apiResponse: UserApiResponse): User {
@@ -58,6 +66,43 @@ export async function getUser(): Promise<User> {
     return convertUser(data);
   } catch (error) {
     console.error("ユーザー情報の取得エラー:", error);
+    throw error;
+  }
+}
+
+/**
+ * ユーザー情報を更新
+ * @param userData 更新するユーザー情報
+ * @returns 更新後のユーザー情報
+ */
+export async function updateUser(userData: UpdateUserRequest): Promise<User> {
+  try {
+    const url = getApiUrl("/users/me");
+
+    const response = await fetch(url, {
+      method: "PUT",
+      credentials: "include",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(userData),
+    });
+
+    if (!response.ok) {
+      if (response.status === 401) {
+        throw new Error("認証エラー: ログインしてください");
+      }
+      const errorData = await response.json();
+      throw new Error(`ユーザー情報の更新に失敗しました: ${errorData.message}`);
+    }
+
+    const { data }: { data: UserApiResponse } = await response.json();
+    console.log("ユーザー情報の更新に成功:", data);
+
+    // APIレスポンスをキャメルケースに変換して返す
+    return convertUser(data);
+  } catch (error) {
+    console.error("ユーザー情報の更新エラー:", error);
     throw error;
   }
 }
