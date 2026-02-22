@@ -66,7 +66,7 @@ export function DiaryPostScreen({
       await createDiary({
         title: title.trim(),
         content: content.trim(),
-        writing_time: writingTime,
+        writing_time_seconds: writingTime,
       });
 
       toast.success("日記を投稿しました！");
@@ -160,7 +160,7 @@ export function DiaryPostScreen({
                 errors.content ? "border-red-500" : "border-gray-300"
               }`}
               placeholder="今日あったことを詳しく書いてみましょう。&#10;シンプルな言葉で書くことで、認知機能のトレーニングになります。"
-              maxLength={1500}
+              maxLength={1000}
             />
             <div className="flex justify-between items-center mt-1">
               <p

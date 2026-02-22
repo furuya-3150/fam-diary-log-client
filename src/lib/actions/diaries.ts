@@ -6,7 +6,7 @@ import { getDiaryAnalysisApiUrl, getDiaryApiUrl } from "@/lib/env";
 export interface CreateDiaryRequest {
   title: string;
   content: string;
-  writing_time: number; // 執筆時間（秒）
+  writing_time_seconds: number; // 執筆時間（秒）
 }
 
 /**
