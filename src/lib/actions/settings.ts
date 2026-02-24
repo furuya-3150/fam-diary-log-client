@@ -1,4 +1,5 @@
 import { getApiUrl } from "@/lib/env";
+import { authFetch } from "@/lib/authFetch";
 /**
  * APIレスポンスの通知設定型（スネークケース）
  */
@@ -32,7 +33,7 @@ export async function getNotificationSettings(): Promise<NotificationSettings> {
   try {
     const url = getApiUrl("/families/me/settings/notifications");
 
-    const response = await fetch(url, {
+    const response = await authFetch(url, {
       credentials: "include", // Cookieを送信
     });
 
@@ -72,7 +73,7 @@ export async function updateNotificationSettings(
       post_created_enabled: settings.postCreatedEnabled,
     };
 
-    const response = await fetch(url, {
+    const response = await authFetch(url, {
       method: "PUT",
       credentials: "include",
       headers: {

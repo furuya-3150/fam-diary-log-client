@@ -1,4 +1,5 @@
 import { env } from "@/lib/env";
+import { authFetch } from "@/lib/authFetch";
 
 /**
  * APIリクエストの招待型（スネークケース）
@@ -27,7 +28,7 @@ export async function sendInvitations(emails: string[]): Promise<void> {
       emails: validEmails,
     };
 
-    const response = await fetch(url, {
+    const response = await authFetch(url, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

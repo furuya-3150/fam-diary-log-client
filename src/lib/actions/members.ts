@@ -1,4 +1,5 @@
 import { getApiUrl } from "@/lib/env";
+import { authFetch } from "../authFetch";
 
 /**
  * APIから取得するメンバーのレスポンス型
@@ -27,7 +28,7 @@ export async function getFamilyMembers(
   try {
     const url = getApiUrl(`/families/me/members?fields=${fields}`);
 
-    const response = await fetch(url, {
+    const response = await authFetch(url, {
       credentials: "include", // Cookieを送信
     });
 

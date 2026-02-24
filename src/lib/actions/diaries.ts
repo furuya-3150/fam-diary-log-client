@@ -1,4 +1,5 @@
 import { getDiaryAnalysisApiUrl, getDiaryApiUrl } from "@/lib/env";
+import { authFetch } from "@/lib/authFetch";
 
 /**
  * 日記投稿リクエストの型
@@ -57,7 +58,7 @@ export async function getDiaries(targetDate: string): Promise<DiaryPost[]> {
       `/families/me/diaries?target_date=${targetDate}`,
     );
 
-    const response = await fetch(url, {
+    const response = await authFetch(url, {
       credentials: "include", // Cookieを送信
     });
 
@@ -104,7 +105,7 @@ export async function createDiary(diary: CreateDiaryRequest): Promise<void> {
   try {
     const url = getDiaryApiUrl("/families/me/diaries");
 
-    const response = await fetch(url, {
+    const response = await authFetch(url, {
       method: "POST",
       credentials: "include",
       headers: {
@@ -134,7 +135,7 @@ export async function getDiaryStreak(): Promise<number> {
   try {
     const url = getDiaryApiUrl(`/families/me/diaries/streak`);
 
-    const response = await fetch(url, {
+    const response = await authFetch(url, {
       credentials: "include",
     });
 
@@ -171,7 +172,7 @@ export async function getMonthlyDiariesCount(
       `/families/me/diaries/count?year=${targetYear}&month=${targetMonth}`,
     );
 
-    const response = await fetch(url, {
+    const response = await authFetch(url, {
       credentials: "include",
     });
 
@@ -198,7 +199,7 @@ export async function getWeeklyAccuracyScore(): Promise<WeeklyScoreData> {
       `/families/me/analyzed-diaries/weekly-accuracy-score?date=${new Date().toISOString().split("T")[0]}`,
     );
 
-    const response = await fetch(url, {
+    const response = await authFetch(url, {
       credentials: "include",
     });
 
@@ -226,7 +227,7 @@ export async function getWeeklyWordCount(): Promise<WeeklyData> {
       `/families/me/analyzed-diaries/weekly-char-count?date=${new Date().toISOString().split("T")[0]}`,
     );
 
-    const response = await fetch(url, {
+    const response = await authFetch(url, {
       credentials: "include",
     });
 
@@ -254,7 +255,7 @@ export async function getWeeklyWritingTime(): Promise<WeeklyData> {
       `/families/me/analyzed-diaries/weekly-writing-time?date=${new Date().toISOString().split("T")[0]}`,
     );
 
-    const response = await fetch(url, {
+    const response = await authFetch(url, {
       credentials: "include",
     });
 

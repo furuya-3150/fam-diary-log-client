@@ -31,7 +31,9 @@ export default function SettingsPage() {
       method: "POST",
       credentials: "include", // Cookieを送信
     });
+    console.log("ログアウトリクエストのレスポンス", response, __filename);
     if (response.ok) {
+      console.log("ログアウト成功: サーバーからの応答", await response.json(), __filename);
       window.location.href = "/"; // ログアウト後にトップページへリダイレクト
     } else {
       console.error("Logout failed");

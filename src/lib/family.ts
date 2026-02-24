@@ -1,4 +1,5 @@
 import { getApiUrl } from "./env";
+import { authFetch } from "@/lib/authFetch";
 
 /**
  * 家族招待トークンのsessionStorageキー
@@ -12,7 +13,7 @@ export const JOIN_TOKEN_STORAGE_KEY = "family_join_token";
  * @returns 成功した場合は true、失敗した場合はエラーをスロー
  */
 export async function submitFamilyJoinRequest(token: string): Promise<void> {
-  const response = await fetch(getApiUrl("/families/join-requests"), {
+  const response = await authFetch(getApiUrl("/families/join-requests"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

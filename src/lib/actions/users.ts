@@ -1,4 +1,5 @@
 import { getApiUrl } from "@/lib/env";
+import { authFetch } from "@/lib/authFetch";
 
 /**
  * APIレスポンスのユーザー情報型（スネークケース）
@@ -48,7 +49,7 @@ export async function getUser(): Promise<User> {
   try {
     const url = getApiUrl("/users/me");
 
-    const response = await fetch(url, {
+    const response = await authFetch(url, {
       credentials: "include", // Cookieを送信
     });
 
@@ -79,7 +80,7 @@ export async function updateUser(userData: UpdateUserRequest): Promise<User> {
   try {
     const url = getApiUrl("/users/me");
 
-    const response = await fetch(url, {
+    const response = await authFetch(url, {
       method: "PUT",
       credentials: "include",
       headers: {

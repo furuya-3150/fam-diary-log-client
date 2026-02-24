@@ -8,29 +8,52 @@ import {
   useCallback,
 } from "react";
 import type { User, AuthContextType } from "@/types/auth";
+import {
+  setTokenExpiresAt as syncTokenExpiry,
+  authFetch,
+} from "@/lib/authFetch";
+import { getApiUrl } from "@/lib/env";
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({
+  children,
+}: Readonly<{ children: React.ReactNode }>) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [tokenExpiresAt, setTokenExpiresAt] = useState<number | null>(null);
 
-  // ユーザー情報を取得
+  /**
+   * tokenExpiresAt が変わったら authFetch モジュールのストアを同期する。
+   */
+  useEffect(() => {
+    syncTokenExpiry(tokenExpiresAt);
+  }, [tokenExpiresAt]);
+
+  /**
+   * ユーザー情報を取得する。authFetch 経由なので、期限切れ直前なら先にリフレッシュされる。
+   */
   const fetchUser = useCallback(async () => {
     try {
-      const response = await fetch("/api/auth/me", {
-        credentials: "include", // Cookieを送信
+      console.log("ユーザー情報の取得を開始", __filename);
+      const response = await authFetch("/api/auth/me", {
+        credentials: "include",
       });
 
       if (response.ok) {
-        const data = await response.json();
+        const data: { user: User; expiresAt: number | null } =
+          await response.json();
         setUser(data.user);
+        setTokenExpiresAt(data.expiresAt);
       } else {
         setUser(null);
+        setTokenExpiresAt(null);
       }
-    } catch (error) {
+    } catch {
       setUser(null);
+      setTokenExpiresAt(null);
     } finally {
+      console.log("finished loading", __filename);
       setLoading(false);
     }
   }, []);
@@ -43,12 +66,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // ログアウト処理
   const logout = async () => {
     try {
-      // ログアウトAPIを呼び出してCookieを削除
       await fetch("/api/auth/logout", {
         method: "POST",
         credentials: "include",
       });
       setUser(null);
+      setTokenExpiresAt(null);
     } catch (error) {
       console.error("Logout failed:", error);
     }
@@ -67,6 +90,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const value: AuthContextType = {
     user,
     loading,
+    tokenExpiresAt,
     isAuthenticated: !!user,
     isBelongsToFamily: !!user?.familyId,
     logout,

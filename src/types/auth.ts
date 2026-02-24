@@ -12,6 +12,8 @@ export interface AuthState {
   loading: boolean;
   isAuthenticated: boolean;
   isBelongsToFamily: boolean;
+  /** アクセストークンの有効期限 (Unix秒)。未ログイン時は null。 */
+  tokenExpiresAt: number | null;
 }
 
 export interface AuthContextType extends AuthState {
