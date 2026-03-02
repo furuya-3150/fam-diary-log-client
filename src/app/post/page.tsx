@@ -29,7 +29,7 @@ export default function PostPage() {
   };
 
   return isBelongsToFamily ? (
-    <DiaryPostScreen onBack={handleBack} onSubmit={handleSubmit} />
+    <DiaryPostScreen onBack={handleBack} />
   ) : (
     router.push("/dashboard")
   );

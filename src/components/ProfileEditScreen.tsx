@@ -1,45 +1,105 @@
-'use client';
+"use client";
 
-import { ArrowLeft, Camera, User, Mail, Calendar, Phone, MapPin, Check } from 'lucide-react';
-import { useState } from 'react';
+import { ArrowLeft, User, Mail } from "lucide-react";
+import { useState, useEffect } from "react";
+import { getUser, updateUser } from "@/lib/actions/users";
+import { useProfileStore } from "@/store/profileStore";
+import { useAuth } from "@/contexts/AuthContext";
+import { Loading } from "./ui/loading";
+import { toast } from "sonner";
 
 interface ProfileEditScreenProps {
   onBack: () => void;
 }
 
-const avatarOptions = ['👨', '👩', '👴', '👵', '👦', '👧', '🧑', '👨‍🦳', '👩‍🦳', '🙂', '😊', '🌸', '🌟', '🐶', '🐱', '🐻'];
+export function ProfileEditScreen({
+  onBack,
+}: Readonly<ProfileEditScreenProps>) {
+  const { loading: authLoading } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [userId, setUserId] = useState("");
+  const [createdAt, setCreatedAt] = useState("");
 
-export function ProfileEditScreen({ onBack }: ProfileEditScreenProps) {
-  const [profile, setProfile] = useState({
-    name: '山田太郎',
-    email: 'taro@example.com',
-    phone: '090-1234-5678',
-    birthday: '1965-05-15',
-    location: '東京都',
-    bio: '家族との時間を大切にしています。毎日日記を書いて、思い出を残すことが楽しみです。',
-    avatar: '👨',
-  });
+  const {
+    name,
+    email,
+    errors,
+    isSubmitting,
+    isDirty,
+    setName,
+    setEmail,
+    setOriginalData,
+    validateAll,
+    setSubmitting,
+    resetToOriginal,
+  } = useProfileStore();
 
-  const [showAvatarPicker, setShowAvatarPicker] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
+  // ユーザー情報を取得
+  useEffect(() => {
+    if (authLoading) return;
 
-  const handleSubmit = (e: React.FormEvent) => {
+    const fetchUser = async () => {
+      try {
+        setLoading(true);
+        const userData = await getUser();
+        setOriginalData(userData);
+        setUserId(userData.id);
+        setCreatedAt(userData.createdAt);
+      } catch (error) {
+        console.error("ユーザー情報の取得エラー:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUser();
+  }, [authLoading, setOriginalData]);
+
+  const handleSubmit = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setIsSubmitting(true);
 
-    // モック保存
-    setTimeout(() => {
-      setIsSubmitting(false);
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
-    }, 1000);
+    if (!validateAll()) {
+      toast.error("入力内容を確認してください");
+      return;
+    }
+
+    setSubmitting(true);
+
+    try {
+      const updatedUser = await updateUser({
+        name: name.trim(),
+        email: email.trim(),
+      });
+
+      // 元データを更新
+      setOriginalData(updatedUser);
+
+      toast.success("プロフィールを更新しました");
+
+      // ダッシュボードに戻る
+      setTimeout(() => {
+        onBack();
+      }, 500);
+    } catch (error) {
+      console.error("プロフィール更新エラー:", error);
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "プロフィールの更新に失敗しました",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  const handleAvatarSelect = (avatar: string) => {
-    setProfile({ ...profile, avatar });
-    setShowAvatarPicker(false);
+  const handleCancel = () => {
+    resetToOriginal();
+    onBack();
   };
+
+  if (authLoading || loading) {
+    return <Loading message="読み込み中..." fullScreen gradient />;
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -61,103 +121,61 @@ export function ProfileEditScreen({ onBack }: ProfileEditScreenProps) {
       </header>
 
       <div className="max-w-2xl mx-auto px-4 py-6 space-y-6">
-        {success && (
-          <div className="bg-green-50 rounded-xl border border-green-200 p-6">
-            <div className="flex items-center gap-3">
-              <Check className="w-6 h-6 text-green-600" />
-              <p className="text-green-900">プロフィールを更新しました</p>
-            </div>
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* アバター */}
-          {/* <div className="bg-white rounded-xl border border-gray-200 p-6"> */}
-            {/* <div className="flex items-center gap-6">
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setShowAvatarPicker(!showAvatarPicker)}
-                  className="w-24 h-24 bg-indigo-100 rounded-full flex items-center justify-center text-4xl hover:bg-indigo-200 transition-colors relative group"
-                >
-                  {profile.avatar}
-                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-10 rounded-full flex items-center justify-center transition-all">
-                    <Camera className="w-6 h-6 text-white opacity-0 group-hover:opacity-100" />
-                  </div>
-                </button>
-              </div>
-
-              <div>
-                <h3 className="text-gray-900 mb-1">プロフィール画像</h3>
-                <p className="text-sm text-gray-600 mb-3">
-                  アイコンをクリックして変更
-                </p>
-                <button
-                  type="button"
-                  onClick={() => setShowAvatarPicker(!showAvatarPicker)}
-                  className="text-sm text-indigo-600 hover:text-indigo-700"
-                >
-                  アイコンを変更
-                </button>
-              </div>
-            </div> */}
-
-            {/* アバター選択 */}
-            {/* {showAvatarPicker && (
-              <div className="mt-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
-                <p className="text-sm text-gray-700 mb-3">アイコンを選択：</p>
-                <div className="grid grid-cols-8 gap-2">
-                  {avatarOptions.map((avatar, index) => (
-                    <button
-                      key={index}
-                      type="button"
-                      onClick={() => handleAvatarSelect(avatar)}
-                      className={`w-12 h-12 rounded-lg flex items-center justify-center text-2xl transition-colors ${
-                        profile.avatar === avatar
-                          ? 'bg-indigo-100 ring-2 ring-indigo-600'
-                          : 'bg-white hover:bg-gray-100'
-                      }`}
-                    >
-                      {avatar}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )} */}
-          {/* </div> */}
-
           {/* 基本情報 */}
           <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
             <h3 className="text-gray-900">基本情報</h3>
 
             <div>
-              <label htmlFor="name" className="flex items-center gap-2 text-gray-900 mb-2">
+              <label
+                htmlFor="name"
+                className="flex items-center gap-2 text-gray-900 mb-2"
+              >
                 <User className="w-4 h-4" />
-                <span>お名前 <span className="text-red-600">*</span></span>
+                <span>
+                  お名前 <span className="text-red-600">*</span>
+                </span>
               </label>
               <input
                 type="text"
                 id="name"
-                value={profile.name}
-                onChange={(e) => setProfile({ ...profile, name: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                onBlur={() => useProfileStore.getState().validateName()}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                  errors.name ? "border-red-500" : "border-gray-200"
+                }`}
                 required
               />
+              {errors.name && (
+                <p className="text-sm text-red-600 mt-1">{errors.name}</p>
+              )}
             </div>
 
             <div>
-              <label htmlFor="email" className="flex items-center gap-2 text-gray-900 mb-2">
+              <label
+                htmlFor="email"
+                className="flex items-center gap-2 text-gray-900 mb-2"
+              >
                 <Mail className="w-4 h-4" />
-                <span>メールアドレス <span className="text-red-600">*</span></span>
+                <span>
+                  メールアドレス <span className="text-red-600">*</span>
+                </span>
               </label>
               <input
                 type="email"
                 id="email"
-                value={profile.email}
-                onChange={(e) => setProfile({ ...profile, email: e.target.value })}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onBlur={() => useProfileStore.getState().validateEmail()}
+                className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent ${
+                  errors.email ? "border-red-500" : "border-gray-200"
+                }`}
                 required
               />
+              {errors.email && (
+                <p className="text-sm text-red-600 mt-1">{errors.email}</p>
+              )}
               <p className="text-sm text-gray-600 mt-1">
                 アプリからの通知はこのメールアドレスに送信されます
               </p>
@@ -168,9 +186,13 @@ export function ProfileEditScreen({ onBack }: ProfileEditScreenProps) {
           <div className="bg-blue-50 rounded-xl border border-blue-200 p-6">
             <h4 className="text-blue-900 mb-3">📌 アカウント情報</h4>
             <div className="space-y-2 text-sm text-blue-800">
-              <p>• 登録日: 2024年1月15日</p>
-              <p>• アカウントID: fambrain_yamada_taro</p>
-              <p>• 家族グループ: 山田家</p>
+              <p>
+                • 登録日:{" "}
+                {createdAt
+                  ? new Date(createdAt).toLocaleDateString("ja-JP")
+                  : "-"}
+              </p>
+              <p>• アカウントID: {userId || "-"}</p>
             </div>
           </div>
 
@@ -178,17 +200,17 @@ export function ProfileEditScreen({ onBack }: ProfileEditScreenProps) {
           <div className="flex gap-3">
             <button
               type="button"
-              onClick={onBack}
+              onClick={handleCancel}
               className="flex-1 py-3 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
             >
               キャンセル
             </button>
             <button
               type="submit"
-              disabled={isSubmitting}
+              disabled={isSubmitting || !isDirty}
               className="flex-1 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? '保存中...' : '変更を保存'}
+              {isSubmitting ? "保存中..." : "変更を保存"}
             </button>
           </div>
         </form>

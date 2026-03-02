@@ -2,7 +2,8 @@ import { jwtVerify } from "jose";
 import { serverEnv } from "./env";
 
 const JWT_SECRET = new TextEncoder().encode(serverEnv.jwtSecret);
-export const COOKIE_AUTH_TOKEN = "auth_token";
+export const COOKIE_AUTH_TOKEN = "access_token";
+export const COOKIE_REFRESH_TOKEN = "refresh_token";
 
 // JWTのペイロード型定義
 export interface JWTPayload {

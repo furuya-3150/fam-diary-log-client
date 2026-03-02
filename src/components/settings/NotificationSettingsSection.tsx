@@ -1,9 +1,10 @@
 import { Bell } from "lucide-react";
 import { useState } from "react";
-
-interface NotificationSettings {
-  newPost: boolean;
-}
+import {
+  type NotificationSettings,
+  updateNotificationSettings,
+} from "@/lib/actions/settings";
+import { toast } from "sonner";
 
 interface NotificationSettingsSectionProps {
   show: boolean;
@@ -25,17 +26,36 @@ interface NotificationSettingsSectionProps {
 export function NotificationSettingsSection({
   show = true,
   initialSettings = {
-    newPost: false,
+    postCreatedEnabled: false,
   },
   onChange,
 }: Readonly<NotificationSettingsSectionProps>) {
   const [settings, setSettings] =
     useState<NotificationSettings>(initialSettings);
+  const [isUpdating, setIsUpdating] = useState(false);
 
-  const handleToggle = (key: keyof NotificationSettings, value: boolean) => {
+  const handleToggle = async (
+    key: keyof NotificationSettings,
+    value: boolean,
+  ) => {
+    const previousSettings = settings;
     const newSettings = { ...settings, [key]: value };
     setSettings(newSettings);
-    onChange?.(newSettings);
+
+    // APIを呼び出す
+    setIsUpdating(true);
+    try {
+      await updateNotificationSettings(newSettings);
+      toast.success("通知設定を更新しました");
+      onChange?.(newSettings);
+    } catch (error) {
+      console.error("通知設定更新エラー:", error);
+      toast.error("通知設定の更新に失敗しました");
+      // エラー時は元に戻す
+      setSettings(previousSettings);
+    } finally {
+      setIsUpdating(false);
+    }
   };
 
   if (!show) {
@@ -57,9 +77,12 @@ export function NotificationSettingsSection({
           </div>
           <input
             type="checkbox"
-            checked={settings.newPost}
-            onChange={(e) => handleToggle("newPost", e.target.checked)}
-            className="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500"
+            checked={settings.postCreatedEnabled}
+            onChange={(e) =>
+              handleToggle("postCreatedEnabled", e.target.checked)
+            }
+            disabled={isUpdating}
+            className="w-5 h-5 text-indigo-600 rounded focus:ring-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
             aria-label="新しい投稿の通知を有効にする"
           />
         </label>

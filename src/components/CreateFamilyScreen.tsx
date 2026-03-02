@@ -1,31 +1,47 @@
-'use client';
+"use client";
 
-import { Users, ArrowLeft } from 'lucide-react';
-import { useState } from 'react';
+import { Users, ArrowLeft } from "lucide-react";
+import { createFamily } from "@/lib/family";
+import { useCreateFamilyStore } from "@/store/createFamilyStore";
 
 interface CreateFamilyScreenProps {
   onBack: () => void;
   onCreateFamily: (familyName: string) => void;
 }
 
-export function CreateFamilyScreen({ onBack, onCreateFamily }: CreateFamilyScreenProps) {
-  const [familyName, setFamilyName] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
+export function CreateFamilyScreen({
+  onBack,
+  onCreateFamily,
+}: Readonly<CreateFamilyScreenProps>) {
+  const {
+    familyName,
+    error,
+    isSubmitting,
+    setFamilyName,
+    setError,
+    setSubmitting,
+    validate,
+    reset,
+  } = useCreateFamilyStore();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
-    if (!familyName.trim()) {
-      alert('家族グループ名を入力してください');
-      return;
+
+    if (!validate()) return;
+
+    setSubmitting(true);
+
+    try {
+      await createFamily(familyName.trim());
+      reset();
+      onCreateFamily(familyName.trim());
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "家族グループの作成に失敗しました";
+      setError(message);
+    } finally {
+      setSubmitting(false);
     }
-    
-    setIsSubmitting(true);
-    
-    // モック処理（実際はバックエンドAPIを呼び出す）
-    setTimeout(() => {
-      onCreateFamily(familyName);
-    }, 1000);
   };
 
   return (
@@ -84,7 +100,9 @@ export function CreateFamilyScreen({ onBack, onCreateFamily }: CreateFamilyScree
 
             {/* 情報ボックス */}
             <div className="bg-indigo-50 rounded-lg p-4 border border-indigo-200">
-              <h4 className="text-indigo-900 mb-2">グループ作成後にできること</h4>
+              <h4 className="text-indigo-900 mb-2">
+                グループ作成後にできること
+              </h4>
               <ul className="space-y-1 text-sm text-indigo-800">
                 <li>• 家族メンバーを招待できます</li>
                 <li>• 日記を投稿して家族と共有できます</li>
@@ -92,12 +110,14 @@ export function CreateFamilyScreen({ onBack, onCreateFamily }: CreateFamilyScree
               </ul>
             </div>
 
+            {error && <p className="text-sm text-red-600">{error}</p>}
+
             <button
               type="submit"
               disabled={isSubmitting}
               className="w-full py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-indigo-400 disabled:cursor-not-allowed"
             >
-              {isSubmitting ? '作成中...' : '家族グループを作成'}
+              {isSubmitting ? "作成中..." : "家族グループを作成"}
             </button>
           </form>
         </div>

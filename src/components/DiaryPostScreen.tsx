@@ -1,23 +1,37 @@
-'use client';
+"use client";
 
-import { useState, useEffect } from 'react';
-import { ArrowLeft, Clock, CheckCircle, AlertCircle, Image as ImageIcon } from 'lucide-react';
-import { DiaryPost } from '../types';
+import { useState, useEffect } from "react";
+import { ArrowLeft, Clock } from "lucide-react";
+import { useDiaryFormStore } from "@/store/diaryFormStore";
+import { createDiary } from "@/lib/actions/diaries";
+import { toast } from "sonner";
 
 interface DiaryPostScreenProps {
   onBack: () => void;
-  onSubmit: (post: Partial<DiaryPost>) => void;
+  onSuccess?: () => void;
 }
 
 const TIME_LIMIT = 300; // 5 minutes in seconds
 
-export function DiaryPostScreen({ onBack, onSubmit }: DiaryPostScreenProps) {
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
+export function DiaryPostScreen({
+  onBack,
+  onSuccess,
+}: Readonly<DiaryPostScreenProps>) {
   const [timeRemaining, setTimeRemaining] = useState(TIME_LIMIT);
   const [isTimerActive, setIsTimerActive] = useState(false);
-  // const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [startTime, setStartTime] = useState<Date | null>(null);
+
+  const {
+    title,
+    content,
+    errors,
+    isSubmitting,
+    setTitle,
+    setContent,
+    validateAll,
+    setSubmitting,
+    reset,
+  } = useDiaryFormStore();
 
   useEffect(() => {
     if (isTimerActive && timeRemaining > 0) {
@@ -35,38 +49,44 @@ export function DiaryPostScreen({ onBack, onSubmit }: DiaryPostScreenProps) {
     }
   }, [content, isTimerActive]);
 
-  useEffect(() => {
-  }, [content]);
+  const handleSubmit = async () => {
+    if (!validateAll()) {
+      toast.error("入力内容を確認してください");
+      return;
+    }
 
-  const handleSubmit = () => {
-    const writingTime = startTime ? Math.floor((new Date().getTime() - startTime.getTime()) / 1000) : 0;
+    setSubmitting(true);
 
-    onSubmit({
-      title,
-      content,
-      // vocabularyScore,
-      writingTime,
-      // image: selectedImage || undefined,
-    });
+    try {
+      // 執筆時間を計算（秒単位）
+      const writingTime = startTime
+        ? Math.floor((Date.now() - startTime.getTime()) / 1000)
+        : 0;
+
+      await createDiary({
+        title: title.trim(),
+        content: content.trim(),
+        writing_time_seconds: writingTime,
+      });
+
+      toast.success("日記を投稿しました！");
+      reset();
+      onSuccess?.();
+    } catch (error) {
+      console.error("日記投稿エラー:", error);
+      toast.error(
+        error instanceof Error ? error.message : "日記の投稿に失敗しました",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins}:${secs.toString().padStart(2, '0')}`;
+    return `${mins}:${secs.toString().padStart(2, "0")}`;
   };
-
-  {/* TODO: 画像アップロード機能実装 */}
-  // const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0];
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.onloadend = () => {
-  //       setSelectedImage(reader.result as string);
-  //     };
-  //     reader.readAsDataURL(file);
-  //   }
-  // };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -81,9 +101,13 @@ export function DiaryPostScreen({ onBack, onSubmit }: DiaryPostScreenProps) {
             <span>戻る</span>
           </button>
 
-          <div className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
-            timeRemaining < 60 ? 'bg-red-100 text-red-700' : 'bg-blue-100 text-blue-700'
-          }`}>
+          <div
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg ${
+              timeRemaining < 60
+                ? "bg-red-100 text-red-700"
+                : "bg-blue-100 text-blue-700"
+            }`}
+          >
             <Clock className="w-5 h-5" />
             <span>{formatTime(timeRemaining)}</span>
           </div>
@@ -96,71 +120,71 @@ export function DiaryPostScreen({ onBack, onSubmit }: DiaryPostScreenProps) {
 
           {/* Title Input */}
           <div className="mb-6">
-            <label className="block text-gray-700 mb-2">タイトル</label>
+            <label htmlFor="diary-title" className="block text-gray-700 mb-2">
+              タイトル <span className="text-red-600">*</span>
+            </label>
             <input
               type="text"
+              id="diary-title"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              onBlur={() => useDiaryFormStore.getState().validateTitle()}
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 ${
+                errors.title ? "border-red-500" : "border-gray-300"
+              }`}
               placeholder="今日の出来事を一言で"
-              maxLength={50}
+              maxLength={255}
             />
-            <p className="text-sm text-gray-500 mt-1">{title.length}/50</p>
+            <div className="flex justify-between items-center mt-1">
+              <p
+                className={`text-sm ${
+                  errors.title ? "text-red-600" : "text-gray-500"
+                }`}
+              >
+                {errors.title || `${title.length}/255`}
+              </p>
+            </div>
           </div>
 
           {/* Content Input */}
           <div className="mb-6">
-            <label className="block text-gray-700 mb-2">本文</label>
+            <label htmlFor="diary-content" className="block text-gray-700 mb-2">
+              本文 <span className="text-red-600">*</span>
+            </label>
             <textarea
+              id="diary-content"
               value={content}
               onChange={(e) => setContent(e.target.value)}
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[200px] resize-none"
+              onBlur={() => useDiaryFormStore.getState().validateContent()}
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 min-h-[200px] resize-none ${
+                errors.content ? "border-red-500" : "border-gray-300"
+              }`}
               placeholder="今日あったことを詳しく書いてみましょう。&#10;シンプルな言葉で書くことで、認知機能のトレーニングになります。"
+              maxLength={1000}
             />
-            <p className="text-sm text-gray-500 mt-1">{content.length}文字</p>
-          </div>
-
-          {/* TODO: 画像アップロード機能実装 */}
-          {/* Image Upload */}
-          {/* <div className="mb-6">
-            <label className="block text-gray-700 mb-2">写真を追加</label>
-            <div className="flex items-center gap-4">
-              {selectedImage ? (
-                <div className="relative">
-                  <img
-                    src={selectedImage}
-                    alt="Selected"
-                    className="w-32 h-32 object-cover rounded-lg"
-                  />
-                  <button
-                    onClick={() => setSelectedImage(null)}
-                    className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600"
-                  >
-                    ×
-                  </button>
-                </div>
-              ) : (
-                <label className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex flex-col items-center justify-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-colors">
-                  <ImageIcon className="w-8 h-8 text-gray-400 mb-2" />
-                  <span className="text-sm text-gray-500">写真を選択</span>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleImageUpload}
-                    className="hidden"
-                  />
-                </label>
-              )}
+            <div className="flex justify-between items-center mt-1">
+              <p
+                className={`text-sm ${
+                  errors.content ? "text-red-600" : "text-gray-500"
+                }`}
+              >
+                {errors.content || `${content.length}/1000文字`}
+              </p>
             </div>
-          </div> */}
+          </div>
 
           {/* Submit Button */}
           <button
             onClick={handleSubmit}
-            disabled={!title || !content || content.length < 1}
+            disabled={
+              !title.trim() ||
+              !content.trim() ||
+              content.trim().length < 10 ||
+              isSubmitting
+            }
             className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
           >
-            確認画面へ進む
+            {isSubmitting ? "投稿中..." : "日記を投稿する"}
           </button>
         </div>
       </div>
