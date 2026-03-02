@@ -1,7 +1,6 @@
-import { jwtVerify, SignJWT } from "jose";
+import { jwtVerify } from "jose";
 import { serverEnv } from "./env";
 
-// const JWT_SECRET = new TextEncoder().encode("your-secret-key-change-this-in-production"); // ここは環境変数から取得するべきですが、デバッグのために直接定義しています
 const JWT_SECRET = new TextEncoder().encode(serverEnv.jwtSecret);
 export const COOKIE_AUTH_TOKEN = "auth_token";
 
@@ -15,23 +14,38 @@ export interface JWTPayload {
 }
 
 /**
- * JWTトークンを検証してペイロードを取得
+ * JWTトークンのペイロードをデコード（署名検証なし・クライアント用）
+ */
+export function decodeToken(token: string): JWTPayload {
+  try {
+    const base64Payload = token.split(".")[1];
+    const decoded = JSON.parse(atob(base64Payload));
+
+    return {
+      sub: decoded.sub as string,
+      role: decoded.role as "admin" | "member" | undefined,
+      familyId: decoded.family_id as string | undefined,
+      iat: decoded.iat,
+      exp: decoded.exp,
+    };
+  } catch {
+    throw new Error("Invalid token format");
+  }
+}
+
+/**
+ * JWTトークンを検証してペイロードを取得（署名検証あり・サーバー用）
  */
 export async function verifyToken(token: string): Promise<JWTPayload> {
-  try {
-    const { payload } = await jwtVerify(token, JWT_SECRET, {
-      algorithms: ["HS256"],
-    });
+  const { payload } = await jwtVerify(token, JWT_SECRET, {
+    algorithms: ["HS256"],
+  });
 
-    // joseのJWTPayloadから独自のJWTPayloadに変換
-    return {
-      sub: payload.sub as string,
-      role: payload.role as "admin" | "member" | undefined,
-      familyId: payload.family_id as string | undefined,
-      iat: payload.iat,
-      exp: payload.exp,
-    };
-  } catch (error) {
-    throw new Error("Invalid or expired token");
-  }
+  return {
+    sub: payload.sub as string,
+    role: payload.role as "admin" | "member" | undefined,
+    familyId: payload.family_id as string | undefined,
+    iat: payload.iat,
+    exp: payload.exp,
+  };
 }
