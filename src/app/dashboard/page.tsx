@@ -10,7 +10,7 @@ import { NoFamilyMessage } from "@/components/NoFamilyMessage";
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { loading, isAuthenticated, isBelongsToFamily } = useAuth();
+  const { loading, isAuthenticated, isBelongsToFamily, user } = useAuth();
 
   if (loading) {
     return <Loading message="認証状態を確認中..." fullScreen gradient />;

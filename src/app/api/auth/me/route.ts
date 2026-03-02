@@ -8,31 +8,29 @@ const DEFAULT_ROLE = "member";
 
 /**
  * GET /api/auth/me
- * 現在ログイン中のユーザー情報を取得
+ * 現在ログイン中のユーザー情報を取得。
+ * トークンの期限確認・リフレッシュは authFetch 層で行われるため、此ルートは検証のみを担当する。
  */
 export async function GET() {
+  const cookieStore = await cookies();
+  const token = cookieStore.get(COOKIE_AUTH_TOKEN)?.value;
+
+  if (!token) {
+    return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
+  }
+
   try {
-    // HttpOnly Cookieからトークンを取得
-    const cookieStore = await cookies();
-    const token = cookieStore.get(COOKIE_AUTH_TOKEN)?.value;
-
-    if (!token) {
-      return NextResponse.json({ error: "Not authenticated" }, { status: 401 });
-    }
-
-    // JWTを検証してペイロードを取得
     const payload = await verifyToken(token);
 
-    // ユーザー情報を返す
     return NextResponse.json({
       user: {
         id: payload.sub,
         role: payload.role || DEFAULT_ROLE,
         familyId: payload.familyId || null,
       },
+      expiresAt: payload.exp ?? null,
     });
-  } catch (error) {
-    // トークンが無効または期限切れ
+  } catch {
     return NextResponse.json(
       { error: "Invalid or expired token" },
       { status: 401 },

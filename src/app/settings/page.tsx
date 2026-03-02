@@ -1,17 +1,26 @@
 'use client';
 
-import { redirect, useRouter } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import { SettingsScreen } from '../../components/SettingsScreen';
 import type { Screen } from '../../types';
 import { toast } from 'sonner';
+import { useAuth } from '@/contexts/AuthContext';
+import { Loading } from '@/components/ui/loading';
 
 export default function SettingsPage() {
   const router = useRouter();
+  const { loading, isAuthenticated, isBelongsToFamily } = useAuth();
 
   useEffect(() => {
-    // 認証チェック
-  }, [router]);
+    if (!loading && !isAuthenticated) {
+      router.push("/");
+    }
+  }, [loading, isAuthenticated, router]);
+
+  if (loading) {
+    return <Loading message="認証状態を確認中..." fullScreen gradient />;
+  }
 
   const handleBack = () => {
     router.push('/dashboard');
@@ -22,7 +31,9 @@ export default function SettingsPage() {
       method: "POST",
       credentials: "include", // Cookieを送信
     });
+    console.log("ログアウトリクエストのレスポンス", response, __filename);
     if (response.ok) {
+      console.log("ログアウト成功: サーバーからの応答", await response.json(), __filename);
       window.location.href = "/"; // ログアウト後にトップページへリダイレクト
     } else {
       console.error("Logout failed");
@@ -49,10 +60,11 @@ export default function SettingsPage() {
   };
 
   return (
+    isBelongsToFamily ? 
     <SettingsScreen 
       onBack={handleBack}
       onLogout={handleLogout}
       onNavigate={handleNavigate}
-    />
+    /> : router.push('/dashboard')
   );
 }

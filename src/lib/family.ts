@@ -1,9 +1,31 @@
 import { getApiUrl } from "./env";
+import { authFetch } from "@/lib/authFetch";
 
 /**
  * 家族招待トークンのsessionStorageキー
  */
 export const JOIN_TOKEN_STORAGE_KEY = "family_join_token";
+
+/**
+ * 家族グループを作成
+ *
+ * @param name 家族グループ名
+ */
+export async function createFamily(name: string): Promise<void> {
+  const response = await authFetch(getApiUrl("/families"), {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    credentials: "include",
+    body: JSON.stringify({ name }),
+  });
+
+  if (!response.ok) {
+    const error = await response.json();
+    throw new Error(error.message || "家族グループの作成に失敗しました");
+  }
+}
 
 /**
  * 家族参加リクエストを送信
@@ -12,7 +34,7 @@ export const JOIN_TOKEN_STORAGE_KEY = "family_join_token";
  * @returns 成功した場合は true、失敗した場合はエラーをスロー
  */
 export async function submitFamilyJoinRequest(token: string): Promise<void> {
-  const response = await fetch(getApiUrl("/families/join-requests"), {
+  const response = await authFetch(getApiUrl("/families/join-requests"), {
     method: "POST",
     headers: {
       "Content-Type": "application/json",

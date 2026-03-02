@@ -7,10 +7,14 @@ import { Loading } from '@/components/ui/loading';
 
 export default function CreateFamilyPage() {
   const router = useRouter();
-  const { loading, isBelongsToFamily } = useAuth();
-
+  const { loading, isBelongsToFamily, isAuthenticated, user } = useAuth();
+  console.log('CreateFamilyPage user:', user);
   if (loading) {
     return <Loading message="認証状態を確認中..." fullScreen gradient />;
+  }
+  if (!isAuthenticated) {
+    router.push('/');
+    return
   }
 
   const handleBack = () => {
@@ -18,13 +22,14 @@ export default function CreateFamilyPage() {
   };
 
   const handleCreateFamily = (familyName: string) => {
-    router.push('/dashboard');
+    window.location.href = "/dashboard"
   };
 
-  return isBelongsToFamily ? (
+  return !isBelongsToFamily ? (
     <CreateFamilyScreen 
       onBack={handleBack}
       onCreateFamily={handleCreateFamily}
     />
-  ) : null;
+    
+  ) : router.push('/dashboard');
 }
