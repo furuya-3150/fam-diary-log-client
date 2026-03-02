@@ -168,7 +168,7 @@ export function DiaryPostScreen({
                   errors.content ? "text-red-600" : "text-gray-500"
                 }`}
               >
-                {errors.content || `${content.length}/1500文字`}
+                {errors.content || `${content.length}/1000文字`}
               </p>
             </div>
           </div>

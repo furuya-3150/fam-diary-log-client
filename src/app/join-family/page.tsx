@@ -22,7 +22,7 @@ import { toast } from "sonner";
 export default function JoinFamilyPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, loading: authLoading, refetch } = useAuth();
   const [status, setStatus] = useState<"checking" | "joining" | "error">(
     "checking",
   );
@@ -74,6 +74,7 @@ export default function JoinFamilyPage() {
       toast.success("家族に参加しました", {
         description: "ようこそ！家族の一員になりました。",
       });
+      refetch(); // ユーザーデータを最新化して家族所属状態を反映
       router.push("/dashboard");
     } catch (error) {
       setStatus("error");

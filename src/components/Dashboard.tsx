@@ -23,7 +23,7 @@ interface DashboardProps {
 
 export function Dashboard({ onNavigate }: DashboardProps) {
   const router = useRouter();
-  const { loading, isAuthenticated } = useAuth();
+  const { loading, isAuthenticated, isBelongsToFamily } = useAuth();
   const { members: memberNameById, loading: membersLoading } = useMembers();
   const [posts, setPosts] = useState<DiaryPost[]>([]);
   const [loadingPosts, setLoadingPosts] = useState(true);

@@ -15,6 +15,8 @@ import {
 import { getApiUrl } from "@/lib/env";
 
 const AuthContext = createContext<AuthContextType | null>(null);
+export const ZERO_UUID = "00000000-0000-0000-0000-000000000000" as const;
+
 
 export function AuthProvider({
   children,
@@ -92,7 +94,7 @@ export function AuthProvider({
     loading,
     tokenExpiresAt,
     isAuthenticated: !!user,
-    isBelongsToFamily: !!user?.familyId,
+    isBelongsToFamily: !!(user?.familyId && user?.familyId != ZERO_UUID),
     logout,
     refetch: fetchUser,
     hasPermission,
