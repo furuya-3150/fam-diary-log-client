@@ -1,0 +1,22 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      # .env に NEXT_PUBLIC_* を記載しておけば COPY . . でコンテナに含まれ
+      # Next.js がビルド時に自動で読み込んで JS バンドルへ埋め込む
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.production.local  # JWT_SECRET など秘密情報は実行時に .env.production.local から渡す
+    environment:
+      - NODE_ENV=production
+    restart: unless-stopped
+    networks:
+      - fam-diary-network
+
+networks:
+  fam-diary-network:
+    driver: bridge

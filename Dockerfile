@@ -19,7 +19,7 @@ COPY . .
 # Next.jsのテレメトリを無効化（オプション）
 ENV NEXT_TELEMETRY_DISABLED=1
 
-# アプリケーションをビルド
+# アプリケーションをビルド（.env の NEXT_PUBLIC_* は Next.js が自動で読み込む）
 RUN npm run build
 
 # 本番環境用ステージ

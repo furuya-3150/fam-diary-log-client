@@ -1,0 +1,27 @@
+# 依存関係（コンテナ内で再インストールする）
+node_modules
+
+# ビルド成果物（コンテナ内でビルドする）
+.next
+
+# 環境変数ファイル
+# .env.production は NEXT_PUBLIC_* のみを記載するためイメージに含めてOK
+# .env.production.local は JWT_SECRET などの秘密情報を記載するため除外
+.env.local
+.env.*.local
+
+# Git
+.git
+.gitignore
+
+# Docker 関連
+.dockerignore
+docker-compose*.yml
+
+# ログ
+*.log
+npm-debug.log*
+
+# エディタ・OS
+.DS_Store
+.vscode
