@@ -7,7 +7,7 @@ RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 # package.jsonとpackage-lock.json（またはyarn.lock）をコピー
-COPY package.json package-lock.json* ./
+COPY package.json package-lock.json* .npmrc* ./
 RUN npm install
 
 # ビルド用ステージ

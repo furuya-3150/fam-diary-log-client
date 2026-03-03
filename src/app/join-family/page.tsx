@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loading } from "@/components/ui/loading";
@@ -19,7 +19,7 @@ import { toast } from "sonner";
  * URLパラメータとして token を受け取り、家族参加フローを開始する
  * 例: /join-family?token=abc123
  */
-export default function JoinFamilyPage() {
+function JoinFamilyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { isAuthenticated, loading: authLoading, refetch } = useAuth();
@@ -108,5 +108,15 @@ export default function JoinFamilyPage() {
       fullScreen
       gradient
     />
+  );
+}
+
+export default function JoinFamilyPage() {
+  return (
+    <Suspense
+      fallback={<Loading message="読み込み中..." fullScreen gradient />}
+    >
+      <JoinFamilyContent />
+    </Suspense>
   );
 }
