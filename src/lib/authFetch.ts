@@ -34,7 +34,7 @@ async function doRefresh(): Promise<void> {
       credentials: "include",
     });
     if (res.ok) {
-      const data: { expiresAt: number | null } = await res.json();
+      const {data}: { data: {expiresAt: number | null} } = await res.json();
       tokenExpiresAt = data.expiresAt;
       console.log(
         "アクセストークンのリフレッシュに成功",
@@ -45,7 +45,8 @@ async function doRefresh(): Promise<void> {
       console.warn("アクセストークンのリフレッシュに失敗: HTTP", res.status);
       tokenExpiresAt = null;
     }
-  } catch {
+  } catch (e) {
+    console.warn('doRefresh error', e)
     tokenExpiresAt = null;
   }
 }

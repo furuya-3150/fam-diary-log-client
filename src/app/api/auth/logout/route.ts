@@ -1,4 +1,5 @@
 import { COOKIE_AUTH_TOKEN, COOKIE_REFRESH_TOKEN } from "@/lib/auth";
+import { env } from "@/lib/env";
 import { NextResponse } from "next/server";
 
 /**
@@ -9,8 +10,9 @@ export async function POST() {
   const response = NextResponse.json({ success: true });
 
   const cookieOptions = {
+    domain: env.cookieDomain,
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
+    secure: true,
     sameSite: "strict" as const,
     maxAge: 0, // 即座に削除
     path: "/",

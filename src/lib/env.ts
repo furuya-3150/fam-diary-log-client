@@ -10,6 +10,7 @@ export const env = {
   apiUrl: process.env.NEXT_PUBLIC_API_URL || "http://localhost:8082",
   diaryApiUrl: process.env.NEXT_PUBLIC_DIARY_URL || "http://localhost:8080",
   diaryAnalysisApiUrl: process.env.NEXT_PUBLIC_DIARY_ANALYSIS_URL || "http://localhost:8081",
+  cookieDomain: process.env.NEXT_PUBLIC_COOKIE_DOMAIN || "localhost",
 
   /**
    * 現在の環境
