@@ -33,7 +33,7 @@ export function DiaryDetailModal({
   return (
     <dialog
       ref={dialogRef}
-      className="w-full max-w-lg max-h-[80vh] m-auto rounded-2xl shadow-xl p-0 backdrop:bg-black/50 flex flex-col"
+      className="w-full max-w-lg max-h-[90dvh] md:max-h-[80vh] min-h-[50dvh] m-auto rounded-2xl shadow-xl p-0 backdrop:bg-black/50 flex flex-col"
       onClose={onClose}
     >
       <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200">
