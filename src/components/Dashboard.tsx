@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { PenSquare, TrendingUp, Settings, Award, Clock } from "lucide-react";
+import { PenSquare, TrendingUp, Settings, Award } from "lucide-react";
 import { Screen } from "../types";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loading } from "./ui/loading";
@@ -16,15 +16,17 @@ import {
 } from "@/lib/actions/diaries";
 import { ErrorDisplay } from "./ui/error-display";
 import { useMembers } from "@/contexts/MembersContext";
+import { DiaryCard } from "./dashboard/DiaryCard";
+import { DiaryDetailModal } from "./dashboard/DiaryDetailModal";
 
 interface DashboardProps {
   onNavigate: (screen: Screen) => void;
 }
 
-export function Dashboard({ onNavigate }: DashboardProps) {
+export function Dashboard({ onNavigate }: Readonly<DashboardProps>) {
   const router = useRouter();
-  const { loading, isAuthenticated, isBelongsToFamily } = useAuth();
-  const { members: memberNameById, loading: membersLoading } = useMembers();
+  const { loading, isAuthenticated } = useAuth();
+  const { members: memberNameById } = useMembers();
   const [posts, setPosts] = useState<DiaryPost[]>([]);
   const [loadingPosts, setLoadingPosts] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +35,7 @@ export function Dashboard({ onNavigate }: DashboardProps) {
   const [monthlyCount, setMonthlyCount] = useState<number>(0);
   const [averageScore, setAverageScore] = useState<number>(0);
   const [streak, setStreak] = useState<number>(0);
+  const [selectedDiary, setSelectedDiary] = useState<DiaryPost | null>(null);
 
   // 日記データと統計データの取得
   useEffect(() => {
@@ -182,77 +185,26 @@ export function Dashboard({ onNavigate }: DashboardProps) {
           ) : (
             <div className="space-y-4">
               {posts.map((diary) => (
-                <div
+                <DiaryCard
                   key={diary.id}
-                  className="bg-white rounded-xl p-4 border border-gray-200 hover:shadow-md transition-shadow"
-                >
-                  <div className="flex items-start gap-4">
-                    {diary.image && (
-                      <img
-                        src={diary.image}
-                        alt=""
-                        className="w-20 h-20 rounded-lg object-cover flex-shrink-0"
-                      />
-                    )}
-
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        {/* TODO: ユーザーのアイコン */}
-                        <h3 className="text-gray-900">{diary.title}</h3>
-                        <div className="flex items-center gap-1 text-xs text-green-600 bg-green-50 px-2 py-1 rounded">
-                          <Award className="w-3 h-3" />
-                          {/* <span>{diary.vocabularyScore}</span> */}
-                        </div>
-                      </div>
-
-                      <p className="text-gray-600 text-sm mb-2 line-clamp-2">
-                        {diary.content}
-                      </p>
-
-                      <div className="flex items-center gap-3 text-sm text-gray-500">
-                        <span>{memberNameById[diary.userId]}</span>
-                        <span>•</span>
-                        <div className="flex items-center gap-1">
-                          <Clock className="w-4 h-4" />
-                          <TimeAgo timestamp={diary.timestamp} />
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                  diary={diary}
+                  memberName={memberNameById[diary.userId]}
+                  onClick={() => setSelectedDiary(diary)}
+                />
               ))}
             </div>
           )}
         </div>
       </div>
+
+      {/* Full content modal */}
+      {selectedDiary && (
+        <DiaryDetailModal
+          diary={selectedDiary}
+          memberName={memberNameById[selectedDiary.userId]}
+          onClose={() => setSelectedDiary(null)}
+        />
+      )}
     </div>
   );
-}
-
-function formatTimeAgo(date: Date): string {
-  const now = new Date();
-  const diffInHours = Math.floor(
-    (now.getTime() - date.getTime()) / (1000 * 60 * 60),
-  );
-
-  if (diffInHours < 24) {
-    return `${diffInHours}時間前`;
-  }
-
-  const diffInDays = Math.floor(diffInHours / 24);
-  return `${diffInDays}日前`;
-}
-
-function TimeAgo({ timestamp }: { timestamp: Date }) {
-  const [timeAgo, setTimeAgo] = useState<string>("");
-
-  useEffect(() => {
-    setTimeAgo(formatTimeAgo(timestamp));
-  }, [timestamp]);
-
-  if (!timeAgo) {
-    return <span>...</span>;
-  }
-
-  return <span>{timeAgo}</span>;
 }
