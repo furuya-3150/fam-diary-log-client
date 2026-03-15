@@ -2,11 +2,7 @@ version: '3.8'
 
 services:
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
-      # .env に NEXT_PUBLIC_* を記載しておけば COPY . . でコンテナに含まれ
-      # Next.js がビルド時に自動で読み込んで JS バンドルへ埋め込む
+    image: takumifuruya/fam-diary-log-client:latest
     ports:
       - "3000:3000"
     env_file:
