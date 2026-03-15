@@ -135,7 +135,11 @@ export function SettingsScreen({
         <LogoutButton onLogout={onLogout} />
 
         {/* アプリ情報 */}
-        <AppInfo version="1.0.0" copyrightYear={2025} appName="FamBrain" />
+        <AppInfo
+          version={process.env.NEXT_PUBLIC_APP_VERSION}
+          copyrightYear={2025}
+          appName="FamBrain"
+        />
       </div>
     </div>
   );
